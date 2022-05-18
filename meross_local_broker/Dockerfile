@@ -57,13 +57,13 @@ RUN mkdir -p /tmp/go \
     export GOARM=6 ; \
     ln -s /lib/ld-linux.so.3 /lib/ld-linux-armhf.so.3 ; \
     export CGO_CFLAGS="-I/usr/local/include -fPIC" ; \
-    export CGO_LDFLAGS="-shared" ; \
+    export CGO_LDFLAGS="-shared -Wl,-unresolved-symbols=ignore-all" ; \
   elif [ "${BUILD_ARCH}" = "armv7" ]; then \
     export GOBIN_GOARCH=armv6l ; \
     export GOARCH=arm ; \
     export GOARM=7 ; \
     export CGO_CFLAGS="-I/usr/local/include -fPIC" ; \
-    export CGO_LDFLAGS="-shared" ; \
+    export CGO_LDFLAGS="-shared -Wl,-unresolved-symbols=ignore-all" ; \
   elif [ "${BUILD_ARCH}" = "aarch64" ]; then \
     export GOBIN_GOARCH=arm64 ; \
     export GOARCH=arm64 ; \
