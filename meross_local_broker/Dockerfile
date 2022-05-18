@@ -56,6 +56,8 @@ RUN mkdir -p /tmp/go \
     export GOARCH=arm ; \
     export GOARM=6 ; \
     ln -s /lib/ld-linux.so.3 /lib/ld-linux-armhf.so.3 ; \
+    export CGO_CFLAGS="-I/usr/local/include -fPIC" ; \
+    export CGO_LDFLAGS="-shared" ; \
   elif [ "${BUILD_ARCH}" = "armv7" ]; then \
     export GOBIN_GOARCH=armv6l ; \
     export GOARCH=arm ; \
