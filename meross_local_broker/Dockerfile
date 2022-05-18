@@ -52,30 +52,30 @@ RUN apt-get update \
 RUN mkdir -p /tmp/go \
   && export GOOS=linux \
   && if [ "${BUILD_ARCH}" = "armhf" ]; then \
-  export GOBIN_GOARCH=armv6l ; \
-  export GOARCH=arm ; \
-  export GOARM=6 ; \
+    export GOBIN_GOARCH=armv6l ; \
+    export GOARCH=arm ; \
+    export GOARM=6 ; \
+    ln -s /lib/ld-linux.so.3 /lib/ld-linux-armhf.so.3 ; \
   elif [ "${BUILD_ARCH}" = "armv7" ]; then \
-  export GOBIN_GOARCH=armv6l ; \
-  export GOARCH=arm ; \
-  export GOARM=7 ; \
+    export GOBIN_GOARCH=armv6l ; \
+    export GOARCH=arm ; \
+    export GOARM=7 ; \
   elif [ "${BUILD_ARCH}" = "aarch64" ]; then \
-  export GOBIN_GOARCH=arm64 ; \
-  export GOARCH=arm64 ; \
+    export GOBIN_GOARCH=arm64 ; \
+    export GOARCH=arm64 ; \
   elif [ "${BUILD_ARCH}" = "i386" ]; then \
-  export GOBIN_GOARCH=386 ; \
-  export GOARCH=386 ; \
+    export GOBIN_GOARCH=386 ; \
+    export GOARCH=386 ; \
   elif [ "${BUILD_ARCH}" = "amd64" ]; then \
-  export GOBIN_GOARCH=amd64 ; \
-  export GOARCH=amd64 ; \
+    export GOBIN_GOARCH=amd64 ; \
+    export GOARCH=amd64 ; \
   else \
-  echo 'NOT VALID BUILD'; exit 1; \
+    echo 'NOT VALID BUILD'; exit 1; \
   fi \
   && curl https://dl.google.com/go/go${GOVERSION}.${GOOS}-${GOBIN_GOARCH}.tar.gz --output /tmp/go/go.tar.gz \
   && tar -C /usr/local -xzf /tmp/go/go.tar.gz \
   && export PATH=$PATH:/usr/local/go/bin \
-  && git clone --branch "v${LIBWEBSOCKETS}" --depth=1 \
-  https://github.com/warmcat/libwebsockets.git /tmp/libwebsockets \
+  && git clone --branch "v${LIBWEBSOCKETS}" --depth=1 https://github.com/warmcat/libwebsockets.git /tmp/libwebsockets \
   && mkdir -p /tmp/libwebsockets/build \
   && cd /tmp/libwebsockets/build \
   && cmake .. \
@@ -116,7 +116,6 @@ RUN mkdir -p /tmp/go \
   https://github.com/iegomez/mosquitto-go-auth.git \
   && openssl s_client --showcerts -connect go.mongodb.org:443 \
   && export GOPROXY='direct' \
-  && go env \
   && cd mosquitto-go-auth \
   && make \
   && cp /tmp/mosquitto-go-auth/pw /usr/share/mosquitto/pw \
