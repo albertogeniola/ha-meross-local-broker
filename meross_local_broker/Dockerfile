@@ -62,6 +62,8 @@ RUN mkdir -p /tmp/go \
     export GOBIN_GOARCH=armv6l ; \
     export GOARCH=arm ; \
     export GOARM=7 ; \
+    export CGO_CFLAGS="-I/usr/local/include -fPIC" ; \
+    export CGO_LDFLAGS="-shared" ; \
   elif [ "${BUILD_ARCH}" = "aarch64" ]; then \
     export GOBIN_GOARCH=arm64 ; \
     export GOARCH=arm64 ; \
