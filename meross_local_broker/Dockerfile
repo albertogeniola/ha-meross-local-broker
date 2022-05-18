@@ -118,9 +118,10 @@ RUN mkdir -p /tmp/go \
   && cd /tmp \
   && git clone --depth 1 --branch "${MOSQUITTO_GO_AUTH}" \
   https://github.com/iegomez/mosquitto-go-auth.git \
-  && openssl s_client --showcerts -connect go.mongodb.org:443 \
   && export GOPROXY='direct' \
   && cd mosquitto-go-auth \
+  && ls -l /usr/local/include \ 
+  && ls -l /tmp/mosquitto/include \
   && make \
   && cp /tmp/mosquitto-go-auth/pw /usr/share/mosquitto/pw \
   && cp /tmp/mosquitto-go-auth/go-auth.so /usr/share/mosquitto/go-auth.so \
