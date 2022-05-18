@@ -56,14 +56,10 @@ RUN mkdir -p /tmp/go \
     export GOARCH=arm ; \
     export GOARM=6 ; \
     ln -s /lib/ld-linux.so.3 /lib/ld-linux-armhf.so.3 ; \
-    export CFLAGS="-I/usr/local/include -fPIC" ; \
-    export LDFLAGS="-shared -Wl,-unresolved-symbols=ignore-all" ; \
   elif [ "${BUILD_ARCH}" = "armv7" ]; then \
     export GOBIN_GOARCH=armv6l ; \
     export GOARCH=arm ; \
     export GOARM=7 ; \
-    export CFLAGS="-I/usr/local/include -fPIC" ; \
-    export LDFLAGS="-shared -Wl,-unresolved-symbols=ignore-all" ; \
   elif [ "${BUILD_ARCH}" = "aarch64" ]; then \
     export GOBIN_GOARCH=arm64 ; \
     export GOARCH=arm64 ; \
@@ -120,9 +116,7 @@ RUN mkdir -p /tmp/go \
   https://github.com/iegomez/mosquitto-go-auth.git \
   && export GOPROXY='direct' \
   && cd mosquitto-go-auth \
-  && ls -l /usr/local/include \ 
-  && ls -l /tmp/mosquitto/include \
-  && make \
+  && make CFLAGS="-I/usr/local/include -fPIC" LDFLAGS="-shared -Wl,-unresolved-symbols=ignore-all" \
   && cp /tmp/mosquitto-go-auth/pw /usr/share/mosquitto/pw \
   && cp /tmp/mosquitto-go-auth/go-auth.so /usr/share/mosquitto/go-auth.so \
   && chmod +x /usr/share/mosquitto/pw \
