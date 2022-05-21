@@ -1,5 +1,5 @@
 name: "Meross Local Broker Addon"
-version: "0.0.1-alpha03"
+version: "0.0.1-alpha04"
 description: "Enables LAN-ONLY broker, avoiding Meross Cloud usage."
 slug: "meross_local_broker"
 image: "ghcr.io/albertogeniola/{arch}-meross_local_broker"
@@ -19,9 +19,19 @@ ports_description:
   2002/tcp: "HTTP API port"
   10001/tcp: "Remote debugger port"
 ingress: true
+startup: services
+panel_icon: mdi-power-socket-us
+panel_title: Meross Addon
+privileged:
+  - NET_ADMIN
+  - SYS_ADMIN
+  - SYS_RAWIO
+  - SYS_TIME
+  - SYS_NICE
 #ingress_port: 8099
 ingress_port: 0
 host_network: true
+host_dbus: true
 homeassistant: "1.0.0"
 options:
   resetdb: false
