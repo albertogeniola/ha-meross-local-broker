@@ -110,7 +110,7 @@ jobs:
         working-directory: meross_local_broker/addon_web_ui
         run: |
           npm i
-          npm build
+          npm run-script build
 
       - name: Build ${{ matrix.addon }} add-on
         if: steps.check.outputs.build_arch == 'true'
