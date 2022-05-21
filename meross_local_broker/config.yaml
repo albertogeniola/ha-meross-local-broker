@@ -24,9 +24,9 @@ ingress_port: 0
 host_network: true
 homeassistant: "1.0.0"
 options:
-  resetdb: False
+  resetdb: false
 schema:
   resetdb: "bool"
 environment:
-  debug: false
-  debug_port: 10001
+  debug: "false"
+  debug_port: "10001"
