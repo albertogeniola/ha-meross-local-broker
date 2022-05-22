@@ -47,6 +47,7 @@ RUN apt-get update \
   xsltproc \
   logrotate \
   libglib2.0-0 \
+  libglib2.0-dev \
   && pip3 install wheel
 
 # Setup GO source # export GOARM=7 ;
