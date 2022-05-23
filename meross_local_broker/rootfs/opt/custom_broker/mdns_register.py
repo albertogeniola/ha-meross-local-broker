@@ -19,7 +19,7 @@ def _parse_args() -> Namespace:
     parser_register.add_argument('--priority', help="Service priority, e.g. 1", required=False, default=1, type=int)
     parser_register.add_argument('--weight', help="Service weight, e.g. 1", required=False, default=1, type=int)
     parser_register.add_argument('--set', help="Add txt data record, in the form KEY=VALUE. Please do not put a space before the '=' sign. In case the value contains spaces, please enclose it with double quotes.", required=False, metavar="KEY=VALUE", nargs='+')
-    parser_register.add_argument('--update-if-present', help="When set, this will ensure the service is updated in case it is already registered.", required=False, metavar="KEY=VALUE", nargs='+')
+    parser_register.add_argument('--update-if-present', help="When set, this will ensure the service is updated in case it is already registered.", action='store_true')
 
     parser_unregister = subparsers.add_parser('unregister', help="Unegisters a service")
     parser_unregister.add_argument('service_path', help="Path of the service, as returned by the registration invocation", type=str)
