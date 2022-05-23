@@ -44,6 +44,7 @@ RUN apt-get update \
   logrotate \
   libglib2.0-0 \
   libglib2.0-dev \
+  libdbus-1-dev \
   && pip3 install wheel
 
 # Setup GO source # export GOARM=7 ;
