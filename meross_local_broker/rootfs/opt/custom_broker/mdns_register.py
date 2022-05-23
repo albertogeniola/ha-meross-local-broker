@@ -56,7 +56,7 @@ def register_service(service_name: str, service_name_template: str, service_type
         print(f"Service '{service_name}' already exists.", file=sys.stderr)
         if update_if_present:
             print("Unregistering it...",file=sys.stderr)
-            unregister_service(f"/org/freedesktop/resolve1/dnssd/{service_name}",file=sys.stderr)
+            unregister_service(f"/org/freedesktop/resolve1/dnssd/{service_name}")
             print("Attempting a new registration...",file=sys.stderr)
             return register_service(service_name=service_name, service_name_template=service_name_template, service_type=service_type, service_port=service_port, service_priority=service_priority, service_weight=service_weight, data=data)
         else :
