@@ -48,6 +48,7 @@ def register_service(service_name: str, service_name_template: str, service_type
     try:
         return _register_service(service_name=service_name, service_name_template=service_name_template, service_type=service_type, service_port=service_port, service_priority=service_priority, service_weight=service_weight, data=data)
     except DBusException as e:
+        print(f"An exception occrred: {str(e)}")
         # Raise any error except "already registered service"
         if not e.get_dbus_name()=="org.freedesktop.resolve1.DnssdServiceExists":
             raise e
@@ -74,14 +75,16 @@ def unregister_service(service_name: str) -> None:
 def main() -> int:
     args = _parse_args()
     if args.command == "register":
+        print(f"Requested service registration for '{args.service_name}'")
         path = register_service(service_name=args.service_name, service_name_template=args.service_name_template, service_type=args.service_type, service_port=args.service_port, service_priority=args.priority, service_weight=args.weight, data=args.set, update_if_present=args.update_if_present)
         print(f"Registered to {path}")
         return 0
     elif args.command == "unregister":
+        print(f"Requested service unregistration for '{args.service_name}'")
         unregister_service(args.service_name)
         return 0
     else:
-        raise ValueError("Invalid invocation: please specify at least one between '--register' and '--unregister' options.")
+        raise ValueError("Invalid invocation: please specify at least one between 'register' and 'unregister' options.")
 
     
 if __name__ == '__main__':
