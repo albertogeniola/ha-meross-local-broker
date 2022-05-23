@@ -134,4 +134,6 @@ RUN pip3 install -r requirements.txt
 
 WORKDIR /
 COPY rootfs /
+RUN mkdir -p /var/run/mdns/meross-mqtt && mkdir -p /var/run/mdns/meross-http-api
+
 RUN chmod +x /usr/local/bin/*.sh

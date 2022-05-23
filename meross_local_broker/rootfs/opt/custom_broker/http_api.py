@@ -66,16 +66,5 @@ def handle_http_exception(e):
 if __name__ == '__main__':
     debug_env = getenv("ENABLE_DEBUG", None)
     enable_debug = debug_env.lower() == "true"
-
-    # Register the mdns service
-    from mdns_register import register_service
-    try:
-        # TODO: real service_port should be fetched from supervisor, as the supervisor can map it behind any other port.
-        ext_api_port = 2002
-        register_service(service_name="meross-local-api", service_name_template="meross-local-api", service_port=ext_api_port)
-    except:
-        _LOGGER.exception("Failed to register MDNS service, continuing anyways.")
-        pass
-
     app.run(port=2002, host="0.0.0.0", debug=enable_debug,
             use_debugger=False, use_reloader=enable_debug)

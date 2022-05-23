@@ -5,4 +5,11 @@
 if { s6-test ${1} -ne 0 }
 if { s6-test ${1} -ne 256 }
 
+# Unregister api service
+bashio::log.info "Unregistering the Meross API service"
+mkdir -p /var/run/mdns/meross-http-api
+path=$(cat /var/run/mdns/meross-http-api/service_path)
+/opt/custom_broker/mdns_register.py unregister $path
+rm -R path
+
 /run/s6/basedir/bin/halt

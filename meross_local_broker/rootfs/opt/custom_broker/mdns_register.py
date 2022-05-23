@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from pkg_resources import require
 from dbus import SystemBus, Interface, DBusException
 from argparse import ArgumentParser, Namespace
