@@ -7,9 +7,6 @@ if { s6-test ${1} -ne 256 }
 
 # Unregister mosquitto service
 bashio::log.info "Unregistering the Mosquitto daemon"
-mkdir -p /var/run/mdns/meross-mqtt
-path=$(cat /var/run/mdns/meross-mqtt/service_path)
-/opt/custom_broker/mdns_register.py unregister $path
-rm -R path
+/opt/custom_broker/mdns_register.py unregister meross-local-mqtt
 
 /run/s6/basedir/bin/halt
