@@ -23,16 +23,12 @@ WORKDIR /usr/src
 RUN apt-get update \
   && apt-get install --no-install-recommends -y gnupg gpg-agent \
   && apt-get --no-install-recommends install -y \
-  avahi-utils \
   build-essential \
   git \
   cmake \
   libssl-dev \
   libffi-dev \
   python3-dev \
-  libavahi-client-dev \
-  libavahi-compat-libdnssd-dev \
-  avahi-daemon \
   dbus \
   bash \
   sqlite \
