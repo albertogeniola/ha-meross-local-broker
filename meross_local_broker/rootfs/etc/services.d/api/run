@@ -2,11 +2,11 @@
 # ==============================================================================
 # Start meross API service
 # ==============================================================================
-# Advertising mosquitto service:
+# Advertising api_port service:
 bashio::log.info "Avertising the Meross API service"
-mosquitto_port=$(bashio::addon.port 2002)
+api_port=$(bashio::addon.port 2002)
 mkdir -p /var/run/mdns/meross-http-api
-/opt/custom_broker/mdns_register.py register meross-local-api meross-local-api _meross-mqtt._tcp $mosquitto_port > /var/run/mdns/meross-http-api/service_path
+/opt/custom_broker/mdns_register.py register meross-local-api meross-local-api _meross-mqtt._tcp $api_port > /var/run/mdns/meross-http-api/service_path
 
 # Starting the API service:
 bashio::log.debug "Starting the Meross daemon SERVICE"
