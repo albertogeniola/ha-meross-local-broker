@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import sys
 from pkg_resources import require
 from dbus import SystemBus, Interface, DBusException
 from argparse import ArgumentParser, Namespace
@@ -19,6 +19,7 @@ def _parse_args() -> Namespace:
     parser_register.add_argument('--priority', help="Service priority, e.g. 1", required=False, default=1, type=int)
     parser_register.add_argument('--weight', help="Service weight, e.g. 1", required=False, default=1, type=int)
     parser_register.add_argument('--set', help="Add txt data record, in the form KEY=VALUE. Please do not put a space before the '=' sign. In case the value contains spaces, please enclose it with double quotes.", required=False, metavar="KEY=VALUE", nargs='+')
+    parser_register.add_argument('--update-if-present', help="When set, this will ensure the service is updated in case it is already registered.", required=False, metavar="KEY=VALUE", nargs='+')
 
     parser_unregister = subparsers.add_parser('unregister', help="Unegisters a service")
     parser_unregister.add_argument('service_path', help="Path of the service, as returned by the registration invocation", type=str)
@@ -26,7 +27,7 @@ def _parse_args() -> Namespace:
     return parser.parse_args()
 
 
-def register_service(service_name: str, service_name_template: str, service_type: str, service_port: int, service_priority: int, service_weight: int, data: list) -> str:
+def _register_service(service_name: str, service_name_template: str, service_type: str, service_port: int, service_priority: int, service_weight: int, data: list) -> str:
     bus = SystemBus()
     resolved = bus.get_object('org.freedesktop.resolve1', '/org/freedesktop/resolve1')
     manager = Interface(resolved,dbus_interface='org.freedesktop.resolve1.Manager')
@@ -39,25 +40,46 @@ def register_service(service_name: str, service_name_template: str, service_type
         txt_data = [ {keyvalue.split('=')[0]: bytearray(keyvalue.split('=')[1].encode('utf8'))} for keyvalue in data ]
 
     service_path = manager.RegisterService(service_name, service_name_template, service_type, service_port,service_priority,service_weight,txt_data)
-    print(f"Service registered in {service_path}")
+    print(f"Service registered in {service_path}", file=sys.stderr)
     return service_path
     
+    
+def register_service(service_name: str, service_name_template: str, service_type: str, service_port: int, service_priority: int, service_weight: int, data: list, update_if_present: bool) -> str:
+    try:
+        return _register_service(service_name=service_name, service_name_template=service_name_template, service_type=service_type, service_port=service_port, service_priority=service_priority, service_weight=service_weight, data=data)
+    except DBusException as e:
+        # Raise any error except "already registered service"
+        if not e.get_dbus_name()=="org.freedesktop.resolve1.DnssdServiceExists":
+            raise e
+        
+        # Handle already registered service
+        print(f"Service '{service_name}' already exists.", file=sys.stderr)
+        if update_if_present:
+            print("Unregistering it...",file=sys.stderr)
+            unregister_service(f"/org/freedesktop/resolve1/dnssd/{service_name}",file=sys.stderr)
+            print("Attempting a new registration...",file=sys.stderr)
+            return register_service(service_name=service_name, service_name_template=service_name_template, service_type=service_type, service_port=service_port, service_priority=service_priority, service_weight=service_weight, data=data)
+        else :
+            raise e
+
 
 def unregister_service(service_path: str) -> None:
     bus = SystemBus()
     resolved = bus.get_object('org.freedesktop.resolve1', '/org/freedesktop/resolve1')
     manager = Interface(resolved,dbus_interface='org.freedesktop.resolve1.Manager')
     service_path = manager.UnregisterService(service_path)
-    print(f"Service unregistered.")
+    print(f"Service unregistered.", file=sys.stderr)
     
 
 def main() -> int:
     args = _parse_args()
     if args.command == "register":
-        path = register_service(service_name=args.service_name, service_name_template=args.service_name_template, service_type=args.service_type, service_port=args.service_port, service_priority=args.priority, service_weight=args.weight, data=args.set)
+        path = register_service(service_name=args.service_name, service_name_template=args.service_name_template, service_type=args.service_type, service_port=args.service_port, service_priority=args.priority, service_weight=args.weight, data=args.set, update_if_present=args.update_if_present)
+        print(path)
         return 0
     elif args.command == "unregister":
-        return unregister_service(args.service_path)
+        unregister_service(args.service_path)
+        return 0
     else:
         raise ValueError("Invalid invocation: please specify at least one between '--register' and '--unregister' options.")
 
