@@ -1,13 +1,21 @@
 #!/usr/bin/with-contenv bashio
+source /opt/utils/bashutils.sh
+
+ADVERTISE=$(get_option 'advertise' 'false')
+if [[ $ADVERTISE == "true" ]]; then
+    # Advertising api_port service:
+    bashio::log.info "Advertising the Meross API service"
+    api_port=$(bashio::addon.port 2002)
+    api_port=${api_port:-"2002"}
+    bashio::log.debug "API_PORT=$api_port"
+    /opt/custom_broker/mdns_register.py register meross_local_api meross_local_api _meross-api._tcp $api_port --update-if-present
+else
+    bashio::log.warning "Advertising disabled. The Meross API service won't be advertised via MDNS."
+fi
+
 # ==============================================================================
 # Start meross API service
 # ==============================================================================
-# Advertising api_port service:
-bashio::log.info "Advertising the Meross API service"
-api_port=$(bashio::addon.port 2002)
-/opt/custom_broker/mdns_register.py register meross_local_api meross_local_api _meross-api._tcp $api_port --update-if-present
-
-# Starting the API service:
 bashio::log.info "Starting the Meross daemon SERVICE"
 exec 2>&1
 exec /usr/local/bin/api.sh

@@ -3,10 +3,11 @@
 CONFIG_PATH=/data/options.json
 
 pushd /opt/custom_broker >/dev/null
+source /opt/utils/bashutils.sh
 
 # Setup debug flag
-debug=${debug_mode:-false}
-if [[ $debug == "true" ]]; then
+DEBUG_MODE=$(get_option 'debug_mode' 'false')
+if [[ $DEBUG_MODE == "true" ]]; then
   bashio::log.info "Starting broker agent with debug flag"
   debug="--debug"
 else

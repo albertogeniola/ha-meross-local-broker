@@ -1,5 +1,5 @@
 name: "Meross Local Broker Addon"
-version: "0.0.1-alpha18"
+version: "0.0.1-alpha19"
 description: "Enables LAN-ONLY broker, avoiding Meross Cloud usage."
 slug: "meross_local_broker"
 image: "ghcr.io/albertogeniola/{arch}-meross_local_broker"
@@ -34,9 +34,12 @@ host_network: true
 host_dbus: true
 homeassistant: "1.0.0"
 options:
-  resetdb: false
+  reinit_db: false
+  advertise: true
+  debug_mode: false
+  debug_port: 10001
 schema:
-  resetdb: "bool"
-environment:
-  debug: "false"
-  debug_port: "10001"
+  reinit_db: "bool"
+  advertise: "bool"
+  debug_mode: "bool"
+  debug_port: "int"

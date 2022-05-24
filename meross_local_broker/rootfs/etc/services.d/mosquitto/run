@@ -1,14 +1,21 @@
 #!/usr/bin/with-contenv bashio
+source /opt/utils/bashutils.sh
+
+ADVERTISE=$(get_option 'advertise' 'false')
+if [[ $ADVERTISE == "true" ]]; then
+    # Advertising mosquitto service:
+    bashio::log.info "Advertising the Mosquitto daemon"
+    mosquitto_port=$(bashio::addon.port 2001)
+    mosquitto_port=${mosquitto_port:-"2001"}
+    bashio::log.debug "MOSQUITTO_PORT=$mosquitto_port"
+    /opt/custom_broker/mdns_register.py register meross_local_mqtt meross_local_mqtt _meross-mqtt._tcp $mosquitto_port --update-if-present
+else
+    bashio::log.warning "Advertising disabled. The Meross MQTT service won't be advertised via MDNS."
+fi
+
 # ==============================================================================
 # Start mosquitto service
 # ==============================================================================
-
-# Advertising mosquitto service:
-bashio::log.info "Advertising the Mosquitto daemon"
-mosquitto_port=$(bashio::addon.port 2001)
-/opt/custom_broker/mdns_register.py register meross_local_mqtt meross_local_mqtt _meross-mqtt._tcp $mosquitto_port --update-if-present
-
-# Start the mosquitto service
 bashio::log.info "Starting the Mosquitto daemon"
 exec 2>&1
 exec /usr/local/bin/mosquitto.sh

@@ -1,12 +1,15 @@
 #!/usr/bin/with-contenv bashio
+source /opt/utils/bashutils.sh
 # ==============================================================================
 # Configures Meross service
 # ==============================================================================
 
 DB_PATH=/data/database.db
 
-# If the user has asked to reinit the db, remove it
-REINIT_DB=${reinit_db:-false}
+# If the user has asked to reinit the db, remove it.
+# Since we want to expose this functionality both from HA and Stand-Alone container,
+# we need to fetch it also from HA
+REINIT_DB=$(get_option 'reinit_db' 'false')
 if [[ $REINIT_DB == "true" ]]; then
   if [[ -f $DB_PATH ]]; then
     bashio::log.warning "User configuration requires DB reinitialization. Removing previous DB data."
