@@ -6,6 +6,6 @@ if { s6-test ${1} -ne 0 }
 if { s6-test ${1} -ne 256 }
 
 # Unregister mosquitto service
-/opt/custom_broker/mdns_register.py unregister meross-local-api
+/opt/custom_broker/mdns_register.py unregister meross_local_api
 
 /run/s6/basedir/bin/halt

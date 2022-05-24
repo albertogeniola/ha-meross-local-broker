@@ -22,7 +22,7 @@ def _parse_args() -> Namespace:
     parser_register.add_argument('--update-if-present', help="When set, this will ensure the service is updated in case it is already registered.", action='store_true', required=False)
 
     parser_unregister = subparsers.add_parser('unregister', help="Unegisters a service")
-    parser_unregister.add_argument('service_name', help="Path of the service, as returned by the registration invocation", type=str)
+    parser_unregister.add_argument('service_name', help="Service name to unregister", type=str)
     
     return parser.parse_args()
 
@@ -66,9 +66,11 @@ def register_service(service_name: str, service_name_template: str, service_type
 
 def unregister_service(service_name: str) -> None:
     bus = SystemBus()
+    service_path = f"/org/freedesktop/resolve1/dnssd/{service_name}"
+    print(f"Unregistering '{service_path}'")
     resolved = bus.get_object('org.freedesktop.resolve1', '/org/freedesktop/resolve1')
     manager = Interface(resolved,dbus_interface='org.freedesktop.resolve1.Manager')
-    manager.UnregisterService(f"/org/freedesktop/resolve1/dnssd/{service_name}")
+    manager.UnregisterService(service_path)
     print(f"Service {service_name} unregistered.")
     
 

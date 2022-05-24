@@ -5,7 +5,7 @@
 # Advertising api_port service:
 bashio::log.info "Advertising the Meross API service"
 api_port=$(bashio::addon.port 2002)
-/opt/custom_broker/mdns_register.py register meross-local-api meross-local-api _meross-api._tcp $api_port --update-if-present
+/opt/custom_broker/mdns_register.py register meross_local_api meross_local_api _meross-api._tcp $api_port --update-if-present
 
 # Starting the API service:
 bashio::log.info "Starting the Meross daemon SERVICE"

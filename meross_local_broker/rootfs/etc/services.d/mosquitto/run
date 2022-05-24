@@ -6,7 +6,7 @@
 # Advertising mosquitto service:
 bashio::log.info "Advertising the Mosquitto daemon"
 mosquitto_port=$(bashio::addon.port 2001)
-/opt/custom_broker/mdns_register.py register meross-local-mqtt meross-local-mqtt _meross-mqtt._tcp $mosquitto_port --update-if-present
+/opt/custom_broker/mdns_register.py register meross_local_mqtt meross_local_mqtt _meross-mqtt._tcp $mosquitto_port --update-if-present
 
 # Start the mosquitto service
 bashio::log.info "Starting the Mosquitto daemon"
