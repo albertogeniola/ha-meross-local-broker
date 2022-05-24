@@ -8,6 +8,7 @@ function get_option {
     ha_value=$(jq -e --raw-output ".$parameter_name" $CONFIG_PATH)
     if [[ $? -eq 0 ]]; then
         echo "$ha_value"
+        return 
     fi
 
     # Then look if an env var is set for that parameter_name
