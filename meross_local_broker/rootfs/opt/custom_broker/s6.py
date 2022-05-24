@@ -84,10 +84,7 @@ class ServiceManager:
         "MQTT Service": ServiceDescriptor("MQTT Service", "/var/run/s6/legacy-services/mosquitto", "/var/log/mosquitto", "Mosquitto MQTT broker service where meross devices connect to."),
         "Local API": ServiceDescriptor("Local API", "/var/run/s6/legacy-services/api", "/var/log/api", "Local HTTP web API server"),
         "Local Agent": ServiceDescriptor("Local Agent", "/var/run/s6/legacy-services/broker", "/var/log/broker", "Local Meross Agent running over MQTT service"),
-        "Web UI Proxy": ServiceDescriptor("Web UI Proxy", "/var/run/s6/legacy-services/nginx", "/var/log/nginx", "Web UI reverse proxy"),
-        "mDNS Service": ServiceDescriptor("mDNS Service", "/var/run/s6/legacy-services/avahi", "/var/log/avahi", "mDNS service broadcaster"),
-        "mDNS HTTP": ServiceDescriptor("mDNS HTTP", "/var/run/s6/legacy-services/http-service-advertise", None, "HTTP mDNS broadcaster"),
-        "mDNS MQTT": ServiceDescriptor("mDNS MQTT", "/var/run/s6/legacy-services/mqtt-service-advertise", None, "MQTT mDNS broadcaster")
+        "Web UI Proxy": ServiceDescriptor("Web UI Proxy", "/var/run/s6/legacy-services/nginx", "/var/log/nginx", "Web UI reverse proxy")
     }
 
     def get_service_info(self, service_name: str) -> Optional[ServiceInfo]:
