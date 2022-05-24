@@ -1,10 +1,12 @@
+CONFIG_PATH=/data/options.json
+
 function get_option {
     parameter_name=$1
     default_value=$2
 
     # Always give precedence to HA, if set.
-    ha_value=$(bashio::config $parameter_name)
-    if [[ $ha_value ]]; then
+    ha_value=$(jq -e --raw-output ".$parameter_name" $CONFIG_PATH)
+    if [[ $ha_value -eq 0 ]]; then
         echo "$ha_value"
     fi
 
