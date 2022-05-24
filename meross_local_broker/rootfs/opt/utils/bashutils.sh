@@ -6,7 +6,7 @@ function get_option {
 
     # Always give precedence to HA, if set.
     ha_value=$(jq -e --raw-output ".$parameter_name" $CONFIG_PATH)
-    if [[ $ha_value -eq 0 ]]; then
+    if [[ $? -eq 0 ]]; then
         echo "$ha_value"
     fi
 
