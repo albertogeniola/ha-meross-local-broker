@@ -2,7 +2,9 @@
   <div *ngIf="unconfigured" class="first-conf-banner">
     <p>
       It looks like this is your first setup! Why won't you start with the
-      <a mat-raised-button color="primary" href="/wizard">Wizard Setup?</a>
+      <button mat-raised-button color="primary" routerLink="/wizard" routerLinkActive="active">
+        <span translate>Wizard Setup?</span>
+      </button>
     </p>
   </div>
   <div fxLayout="row wrap" fxLayoutGap="12px">
