@@ -106,7 +106,7 @@ class ServiceManager:
         service_descriptor=self._SERVICE_DIRS.get(service_name)
         if service_descriptor is None:
             raise BadRequestError("Invalid service name specified.")
-        process = Popen(['/bin/s6-svc', '-wD', '-d', service_descriptor.service_dir], shell=False, stdout=PIPE, stderr=subprocess.STDOUT)
+        process = Popen(['/usr/bin/s6-svc', '-wD', '-d', service_descriptor.service_dir], shell=False, stdout=PIPE, stderr=subprocess.STDOUT)
         if wait:
             stdout, stderr = process.communicate()
             return process.returncode, stdout.decode('utf-8')
@@ -117,7 +117,7 @@ class ServiceManager:
         service_descriptor=self._SERVICE_DIRS.get(service_name)
         if service_descriptor is None:
             raise BadRequestError("Invalid service name specified.")
-        process = Popen(['/bin/s6-svc', '-wU', '-u', service_descriptor.service_dir], shell=False, stdout=PIPE, stderr=subprocess.STDOUT)
+        process = Popen(['/usr/bin/s6-svc', '-wU', '-u', service_descriptor.service_dir], shell=False, stdout=PIPE, stderr=subprocess.STDOUT)
         if wait:
             stdout, stderr = process.communicate()
             return process.returncode, stdout.decode('utf-8')
@@ -128,7 +128,7 @@ class ServiceManager:
         service_descriptor = self._SERVICE_DIRS.get(service_name)
         if service_descriptor is None:
             raise BadRequestError("Invalid service name specified.")
-        process = Popen(['/bin/s6-svc', '-wR', '-r', service_descriptor.service_dir], shell=False, stdout=PIPE, stderr=subprocess.STDOUT)
+        process = Popen(['/usr/bin/s6-svc', '-wR', '-r', service_descriptor.service_dir], shell=False, stdout=PIPE, stderr=subprocess.STDOUT)
         if wait:
             stdout, stderr = process.communicate()
             return process.returncode, stdout.decode('utf-8')
