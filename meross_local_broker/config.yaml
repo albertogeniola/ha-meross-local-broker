@@ -1,5 +1,5 @@
 name: "Meross Local Broker Addon"
-version: "0.0.1-alpha24"
+version: "0.0.1-alpha25"
 description: "Enables LAN-ONLY broker, avoiding Meross Cloud usage."
 slug: "meross_local_broker"
 image: "ghcr.io/albertogeniola/{arch}-meross_local_broker"
@@ -28,9 +28,9 @@ privileged:
   - SYS_RAWIO
   - SYS_TIME
   - SYS_NICE
-#ingress_port: 8099
-ingress_port: 0
-host_network: true
+ingress_port: 8099
+#ingress_port: 0
+#host_network: true
 host_dbus: true
 homeassistant: "1.0.0"
 options:
