@@ -10,7 +10,8 @@ from model.exception import BadRequestError
 from constants import DEFAULT_USER_ID
 from s6 import service_manager
 from setup import setup_account
-import time
+from datetime import datetime
+from meross_iot.model.http.exception import BadLoginException
 
 
 admin_blueprint = Blueprint('admin', __name__)
@@ -96,17 +97,19 @@ def get_service_log(service_name: str):
 
 
 # TODO: check super-admin role...
-@admin_blueprint.route('/configuration/account', methods=['GET'])
+@admin_blueprint.route('/configuration', methods=['GET'])
 def get_account():
     """ Returns the configured account """
-    user = dbhelper.get_user_by_id(userid=DEFAULT_USER_ID)
-    if user is None:
-        raise BadRequestError(msg=f"Invalid/Missing userid {DEFAULT_USER_ID} in the DB. Please set it again.")
-    return jsonify(user.serialize())
+    # Get the configured account
+    configuration = dbhelper.get_configuration()
+    if configuration is None:
+        _LOGGER.warning("Invalid/Missing userid %s in the DB. Please set it again.", DEFAULT_USER_ID)
+        return jsonify(None)
+    return jsonify(configuration.serialize())
 
 
 # TODO: check super-admin role...
-@admin_blueprint.route('/configuration/account', methods=['PUT'])
+@admin_blueprint.route('/configuration', methods=['PUT'])
 def set_account():
     """ Configures the Meross Account to be use as authentication method """
     # Arg checks
@@ -115,7 +118,7 @@ def set_account():
         raise BadRequestError(msg=f"Missing json payload.")
     email: str = payload.get('email')
     password: str = payload.get('password')
-    meross_link: bool = payload.get('enableMerossLink')
+    meross_link: bool = payload.get('enableMerossLink', False)
     if email is None:
         raise BadRequestError(msg=f"Missing or invalid email.")
     if password is None:
@@ -124,8 +127,13 @@ def set_account():
         raise BadRequestError(msg=f"Missing or invalid enableMerossLink option.")
     
     # Setup Account
-    user = setup_account(email=email, password=password, enable_meross_link=meross_link)  
+    try:
+        user = setup_account(email=email, password=password, enable_meross_link=meross_link)
+    except BadLoginException as e:
+        raise BadRequestError(msg=f"Invalid credentials.")
     
+    dbhelper.add_update_configuration(enable_meross_link=meross_link, local_user_id=user.user_id)
+
     # As soon as the Account is set, we need to restart the mosquitto and the broker services
     _LOGGER.warn("Restarting broker & MQTT services (due to account configuration changes)")
     service_manager.restart_service("Local Agent")
@@ -151,18 +159,32 @@ def get_events():
         except ValueError as e:
             raise BadRequestError(msg="Invalid limit parameter specified. Limit must be a positive integer or null.")
 
-    event_type = args.get('event_type')
+    event_type = args.get('eventType')
     if event_type is not None:
         try:
             event_type = EventType(event_type)
         except ValueError as e:
-            raise BadRequestError(msg=f"Invalid event_type parameter specified: {event_type}.")
+            raise BadRequestError(msg=f"Invalid eventType parameter specified: {event_type}.")
 
-    device_uuid = args.get('device_uuid')
-    sub_device_id = args.get('sub_device_id')
-    user_id = args.get('user_id')
+    from_timestamp = args.get('fromTimestamp')
+    if from_timestamp is not None:
+        try:
+            from_timestamp = datetime.fromtimestamp(float(from_timestamp))
+        except (ValueError,TypeError) as e:
+            raise BadRequestError(msg=f"Invalid fromTimestamp parameter specified: {from_timestamp}.")
 
-    events = dbhelper.get_events(limit=limit, event_type=event_type, device_uuid=device_uuid, sub_device_id=sub_device_id, user_id=user_id)
+    to_timestamp = args.get('toTimestamp')
+    if to_timestamp is not None:
+        try:
+            to_timestamp = datetime.fromtimestamp(float(to_timestamp))
+        except (ValueError,TypeError) as e:
+            raise BadRequestError(msg=f"Invalid toTimestamp parameter specified: {from_timestamp}.")
+
+    device_uuid = args.get('deviceUuid')
+    sub_device_id = args.get('subDeviceId')
+    user_id = args.get('userId')
+
+    events = dbhelper.get_events(limit=limit, event_type=event_type, device_uuid=device_uuid, sub_device_id=sub_device_id, user_id=user_id, from_timestamp=from_timestamp, to_timestamp=to_timestamp)
     
     # TODO: Restart/Reload broker?
     return jsonify([e.serialize() for e in events])

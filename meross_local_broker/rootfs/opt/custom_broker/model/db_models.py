@@ -1,3 +1,4 @@
+from email.policy import default
 from optparse import Option
 from typing import Dict, Optional
 
@@ -16,7 +17,13 @@ from model.enums import BridgeStatus, EventType
 class Serializer(object):
 
     def serialize(self):
-        return {c: getattr(self, c) for c in inspect(self).attrs.keys()}
+        return {Serializer.to_camel_case(c): getattr(self, c) for c in inspect(self).attrs.keys()}
+
+    @staticmethod
+    def to_camel_case(snake_str) -> str:
+        #return snake_str
+        components = snake_str.split('_')
+        return components[0] + ''.join(x.title() for x in components[1:])
 
     @staticmethod
     def serialize_list(l):
@@ -32,7 +39,6 @@ class User(Base, Serializer):
     salt = Column(String(64))
     password = Column(String(64))
     mqtt_key = Column(String(64))
-    enable_meross_link = Column(Boolean, default=False)
     owned_devices = relationship("Device", back_populates="owner_user")
 
     def __init__(self, email: str, salt: str, password: str, mqtt_key: str, user_id: Optional[int], enable_meross_link: Optional[bool] = False, *args, **kwargs):
@@ -50,7 +56,7 @@ class User(Base, Serializer):
         d = Serializer.serialize(self)
         del d['password']
         del d['salt']
-        del d['owned_devices']
+        del d['ownedDevices']
         return d
 
 
@@ -126,12 +132,12 @@ class Device(Base, Serializer):
 
     def serialize(self):
         d = Serializer.serialize(self)
-        del d['owner_user']
-        d['online_status'] = self.online_status.value
-        d['user_email'] = self.owner_user.email
+        del d['ownerUser']
+        d['onlineStatus'] = self.online_status.value
+        d['userEmail'] = self.owner_user.email
         d['channels'] = DeviceChannel.serialize_list(self.channels)
-        d['child_subdevices'] = SubDevice.serialize_list(self.child_subdevices)
-        d['bridge_status'] = self.bridge_status.name
+        d['childSubdevices'] = SubDevice.serialize_list(self.child_subdevices)
+        d['bridgeStatus'] = self.bridge_status.name
         return d
 
 
@@ -153,7 +159,7 @@ class SubDevice(Base, Serializer):
 
     def serialize(self):
         d = Serializer.serialize(self)
-        del d['parent_device']
+        del d['parentDevice']
         return d
 
 
@@ -169,9 +175,22 @@ class Event(Base, Serializer):
     user_id = Column(String, nullable=True)
     details = Column(String, nullable=True)
 
-    
     def serialize(self):
         d = Serializer.serialize(self)
-        d['event_type'] = self.event_type.value
+        d['eventType'] = self.event_type.value
         return d
-    
+
+
+class Configuration(Base, Serializer):
+    __tablename__ = 'configuration'
+    configuration_id = Column(Integer, primary_key=True)
+    enable_meross_link = Column(Boolean, default=False)
+    local_account_id = Column(String, ForeignKey('users.user_id'))
+    local_account = relationship("User")
+
+    def serialize(self):
+        d = Serializer.serialize(self)
+        del d['localAccount']
+        del d['localAccountId']
+        d['email'] = self.local_account.email
+        return d

@@ -1,14 +1,16 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Device, DeviceOnlineStatus } from '@app/model/device';
 import { Event } from '@app/model/event';
 import { User } from '@app/model/user';
+import { Configuration } from '@app/model/configuration';
 import { SubdeviceStore } from '@app/providers/subdevice';
 import { ServiceStatus } from '@app/model/service';
 import { Subdevice } from '@app/model/subdevice';
 import { environment } from '@env/environment';
 import { Observable, of } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
  * Interface for ADMIN apis
@@ -17,7 +19,7 @@ import { catchError, tap, map } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class AdminService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private snackBar: MatSnackBar) {}
 
   /**
    * Handle Http operation that failed.
@@ -28,6 +30,16 @@ export class AdminService {
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(error); // log to console instead
+      let message: string = 'An error occurred.';
+
+      // Check if an error is available from the data
+      let data = error.error;
+      if ('info' in data) {
+        message = 'Error occurred: ' + data.info;
+      }
+
+      // Parse the HTTP result message
+      this.snackBar.open(message);
       return of(result as T);
     };
   }
@@ -87,15 +99,15 @@ export class AdminService {
       .pipe(catchError(this.handleError('getServiceLog', [])));
   }
 
-  getAccountConfiguration(): Observable<User> {
+  getConfiguration(): Observable<Configuration | null> {
     var headers = new HttpHeaders();
     headers.append('Content-Type', 'application/json; charset=utf-8');
     return this.http
-      .get<User | any>(environment.backend + '/_admin_/configuration/account', { headers })
-      .pipe(catchError(this.handleError('getAccountConfiguration', null)));
+      .get<User | null>(environment.backend + '/_admin_/configuration', { headers })
+      .pipe(catchError(this.handleError('getConfiguration', null)));
   }
 
-  updateAccountConfiguration(email: string, password: string, enableMerossLink: boolean): Observable<User> {
+  updateConfiguration(email: string, password: string, enableMerossLink: boolean): Observable<Configuration> {
     var headers = new HttpHeaders();
     headers.append('Content-Type', 'application/json; charset=utf-8');
     var data = {
@@ -105,14 +117,24 @@ export class AdminService {
     };
 
     return this.http
-      .put<User | null>(environment.backend + '/_admin_/configuration/account', data, { headers })
-      .pipe(catchError(this.handleError('updateAccountConfiguration', null)));
+      .put<User | null>(environment.backend + '/_admin_/configuration', data, { headers })
+      .pipe(catchError(this.handleError('updateConfiguration', null)));
   }
 
   // TODO: pass query string parameters
-  getEvents(): Observable<Event[]> {
+  getEvents(fromTimestamp?: Date, toTimestamp?: Date, limit?: number): Observable<Event[]> {
     var headers = new HttpHeaders();
     headers.append('Content-Type', 'application/json; charset=utf-8');
+    let params = new HttpParams();
+    if (fromTimestamp != null) {
+      params.append('fromTimestamp', '' + fromTimestamp.getTime());
+    }
+    if (toTimestamp != null) {
+      params.append('toTimestamp', '' + toTimestamp.getTime());
+    }
+    if (limit != null) {
+      params.append('limit', '' + limit);
+    }
     return this.http
       .get<Event[]>(environment.backend + '/_admin_/events', { headers })
       .pipe(catchError(this.handleError('getEvents', null)));

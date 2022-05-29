@@ -3,10 +3,11 @@ from logger import get_logger
 from typing import Optional, List
 from constants import BASE62_ALPHABET
 from database import db_session
-from model.db_models import UserToken, Device, User, DeviceChannel, SubDevice, Event
+from model.db_models import UserToken, Device, User, DeviceChannel, SubDevice, Event, Configuration
 from datetime import datetime
 from utilities import _hash_password
 from model.enums import BridgeStatus, EventType
+from datetime import datetime
 import random
 
 
@@ -17,19 +18,9 @@ class DbHelper:
     def __init__(self):
         self._s = db_session
 
-    def add_update_user(self, email: str, password: str, user_key: str, user_id: int, enable_meross_link: bool = False) -> User:
-        # Consistency check on enable_meross_link
-        # If there is any other user configured as "bridge" for Meross Link, unset it.
-        if enable_meross_link:
-            u = self._s.query(User).filter(User.enable_meross_link==True).first()
-            if u is not None and u.email != email:
-                l.warn("Changing federated meross user. Not using credentials from %s account as Meross Link.", u.email)
-                u.enable_meross_link = False
-                self._s.add(u)
-                self._s.commit()
-        
+    def add_update_user(self, email: str, password: str, user_key: str, user_id: int) -> User:
         # Check if the given user/password already exists or is valid.
-        u = self._s.query(User).filter(User.user_id == user_id).first()
+        u = self._s.query(User).filter(User.email == email).first()
         if u is None:
             l.info(f"User %s not found in db. Adding a new entry...", email)
             if user_key is None:
@@ -37,7 +28,7 @@ class DbHelper:
                 user_key = ''
             salt = ''.join(random.choice(BASE62_ALPHABET) for i in range(16))
             hashed_pass = _hash_password(salt=salt, password=password)
-            u = User(email=email, user_id=user_id, salt=salt, password=hashed_pass, mqtt_key=user_key, enable_meross_link=enable_meross_link)
+            u = User(email=email, user_id=user_id, salt=salt, password=hashed_pass, mqtt_key=user_key)
             self._s.add(u)
             self._s.commit()
         else:
@@ -193,7 +184,21 @@ class DbHelper:
         self._s.commit()
         return event
 
-    def get_events(self, limit: int = 50, event_type: EventType = None, device_uuid: str = None, sub_device_id: str = None, user_id:str = None) -> List[Event]:
+    def get_configuration(self) -> Optional[Configuration]:
+        """ Return the current configuration """
+        q = self._s.query(Configuration).filter(Configuration.configuration_id==0).first()
+        return q
+
+    def add_update_configuration(self, enable_meross_link:bool, local_user_id:str) -> Configuration:
+        q: Configuration = self._s.query(Configuration).filter(Configuration.configuration_id==0).first()
+        if (q is None):
+            q = Configuration(configuration_id=0)
+        q.enable_meross_link = enable_meross_link
+        q.local_account_id = local_user_id
+        self._s.add(q)
+        self._s.commit()
+
+    def get_events(self, limit: int = 50, event_type: EventType = None, device_uuid: str = None, sub_device_id: str = None, user_id:str = None, from_timestamp: datetime = None, to_timestamp: datetime = None) -> List[Event]:
         """ Searches for events based on the inputed parameters """
         q = self._s.query(Event)
         if event_type is not None:
@@ -204,6 +209,10 @@ class DbHelper:
             q = q.filter(Event.sub_device_id == sub_device_id)
         if user_id is not None:
             q = q.filter(Event.user_id == user_id)
+        if from_timestamp is not None:
+            q = q.filter(Event.timestamp >= from_timestamp)
+        if to_timestamp is not None:
+            q = q.filter(Event.timestamp <= to_timestamp)
         return q.order_by(Event.event_id.desc()).limit(limit).all()
 
 dbhelper = DbHelper()

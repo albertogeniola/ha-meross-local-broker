@@ -43,7 +43,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     // Update the device and subdevice lists once
     this.deviceStore.devices.subscribe((devices) => (this.deviceSource.data = devices));
     this.subdeviceStore.devices.subscribe((devices) => (this.subdeviceSource.data = devices));
-    this.adminService.getAccountConfiguration().subscribe((account: User) => {
+    this.adminService.getConfiguration().subscribe((account: User) => {
       this.unconfigured = !account;
     });
   }
