@@ -204,6 +204,6 @@ class DbHelper:
             q = q.filter(Event.sub_device_id == sub_device_id)
         if user_id is not None:
             q = q.filter(Event.user_id == user_id)
-        return q.limit(limit).all()
+        return q.order_by(Event.event_id.desc()).limit(limit).all()
 
 dbhelper = DbHelper()

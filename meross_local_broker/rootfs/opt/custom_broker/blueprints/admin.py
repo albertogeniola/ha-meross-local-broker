@@ -4,6 +4,7 @@ from typing import Dict, List
 from flask import jsonify, request
 from flask import Blueprint
 from db_helper import dbhelper
+from model.enums import EventType
 from model.db_models import Device
 from model.exception import BadRequestError
 from constants import DEFAULT_USER_ID
@@ -139,9 +140,29 @@ def set_account():
 def get_events():
     """ Returns the latest events """
     # Arg checks
-    # TODO: use query string for filtering logic
     
-    events = dbhelper.get_events()
+    args = request.args
+    limit = args.get('limit')
+    if limit is not None:
+        try:
+            limit = int(limit)
+            if limit <= 0:
+                raise ValueError()
+        except ValueError as e:
+            raise BadRequestError(msg="Invalid limit parameter specified. Limit must be a positive integer or null.")
 
+    event_type = args.get('event_type')
+    if event_type is not None:
+        try:
+            event_type = EventType(event_type)
+        except ValueError as e:
+            raise BadRequestError(msg=f"Invalid event_type parameter specified: {event_type}.")
+
+    device_uuid = args.get('device_uuid')
+    sub_device_id = args.get('sub_device_id')
+    user_id = args.get('user_id')
+
+    events = dbhelper.get_events(limit=limit, event_type=event_type, device_uuid=device_uuid, sub_device_id=sub_device_id, user_id=user_id)
+    
     # TODO: Restart/Reload broker?
     return jsonify([e.serialize() for e in events])

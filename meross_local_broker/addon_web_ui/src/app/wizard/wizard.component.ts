@@ -9,7 +9,7 @@ import { MatStepper } from '@angular/material/stepper';
 export class WizardComponent implements OnInit {
   @ViewChild('stepper') stepper!: MatStepper;
 
-  loginVerified: boolean = true;
+  loginVerified: boolean = false;
 
   constructor() {}
 

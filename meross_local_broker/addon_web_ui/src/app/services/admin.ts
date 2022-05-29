@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Device, DeviceOnlineStatus } from '@app/model/device';
+import { Event } from '@app/model/event';
 import { User } from '@app/model/user';
 import { SubdeviceStore } from '@app/providers/subdevice';
 import { ServiceStatus } from '@app/model/service';
@@ -106,6 +107,15 @@ export class AdminService {
     return this.http
       .put<User | null>(environment.backend + '/_admin_/configuration/account', data, { headers })
       .pipe(catchError(this.handleError('updateAccountConfiguration', null)));
+  }
+
+  // TODO: pass query string parameters
+  getEvents(): Observable<Event[]> {
+    var headers = new HttpHeaders();
+    headers.append('Content-Type', 'application/json; charset=utf-8');
+    return this.http
+      .get<Event[]>(environment.backend + '/_admin_/events', { headers })
+      .pipe(catchError(this.handleError('getEvents', null)));
   }
 
   private executeServiceCommand(serviceName: string, command: string): Observable<boolean> {
