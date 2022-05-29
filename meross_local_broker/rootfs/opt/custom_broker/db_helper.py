@@ -193,5 +193,17 @@ class DbHelper:
         self._s.commit()
         return event
 
+    def get_events(self, limit: int = 50, event_type: EventType = None, device_uuid: str = None, sub_device_id: str = None, user_id:str = None) -> List[Event]:
+        """ Searches for events based on the inputed parameters """
+        q = self._s.query(Event)
+        if event_type is not None:
+            q = q.filter(Event.event_type == event_type)
+        if device_uuid is not None:
+            q = q.filter(Event.device_uuid == device_uuid)
+        if sub_device_id is not None:
+            q = q.filter(Event.sub_device_id == sub_device_id)
+        if user_id is not None:
+            q = q.filter(Event.user_id == user_id)
+        return q.limit(limit).all()
 
 dbhelper = DbHelper()

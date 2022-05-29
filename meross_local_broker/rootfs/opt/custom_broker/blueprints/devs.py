@@ -107,6 +107,12 @@ def device_login():
 
 
 def _custom_login(email: str, password: str):
+    # Skip login for AGENT as it will use another login option
+    if email == "_agent":
+        _LOGGER.error("LOGIN_CHECK(custom)=> User \"%s\": skipping login via API, as it will use sql login logic.", email)
+        dbhelper.store_event(event_type=EventType.AGENT_LOGIN_ATTEMPTED, details=f"Agent has tried to login to this API from {str(request.remote_addr)}. Atempt will be ignored.")
+        return "ko", 401
+
     # Lookup user email by the given username.
     user = dbhelper.get_user_by_email(email=email)
     if user is None:

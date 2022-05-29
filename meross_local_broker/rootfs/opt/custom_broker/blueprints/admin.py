@@ -123,12 +123,25 @@ def set_account():
         raise BadRequestError(msg=f"Missing or invalid enableMerossLink option.")
     
     # Setup Account
-    user = setup_account(email=email, password=password, enable_meross_link=meross_link)
-
+    user = setup_account(email=email, password=password, enable_meross_link=meross_link)  
+    
     # As soon as the Account is set, we need to restart the mosquitto and the broker services
     _LOGGER.warn("Restarting broker & MQTT services (due to account configuration changes)")
     service_manager.restart_service("Local Agent")
     service_manager.restart_service("MQTT Service")
-    
+
     # TODO: Restart/Reload broker?
     return jsonify(user.serialize())
+
+
+# TODO: check super-admin role...
+@admin_blueprint.route('/events', methods=['GET'])
+def get_events():
+    """ Returns the latest events """
+    # Arg checks
+    # TODO: use query string for filtering logic
+    
+    events = dbhelper.get_events()
+
+    # TODO: Restart/Reload broker?
+    return jsonify([e.serialize() for e in events])

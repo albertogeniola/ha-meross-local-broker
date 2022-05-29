@@ -6,6 +6,7 @@ docker run --rm \
     -p 2001:2001/tcp \
     -p 2002:2002/tcp \
     -p 10001:10001/tcp \
+    --env advertise=false \
     --env debug_mode=true \
     --env debug_port=10001 \
     --env reinit_db=true \

@@ -3,7 +3,9 @@ from asyncore import read
 from subprocess import Popen, PIPE
 from typing import Dict, Optional, List, Tuple
 from os import path
+from db_helper import dbhelper
 from model.exception import BadRequestError
+from model.enums import EventType
 
 
 class ServiceDescriptor:
@@ -109,7 +111,10 @@ class ServiceManager:
         process = Popen(['/usr/bin/s6-svc', '-wD', '-d', service_descriptor.service_dir], shell=False, stdout=PIPE, stderr=subprocess.STDOUT)
         if wait:
             stdout, stderr = process.communicate()
+            dbhelper.store_event(event_type=EventType.SERVICE_STOP, details=f"Service {service_name}; stop command returned {process.returncode}.")
             return process.returncode, stdout.decode('utf-8')
+        
+        dbhelper.store_event(event_type=EventType.SERVICE_STOP, details=f"Service {service_name}; stop result not awaited.")
         return None, None
 
     def start_service(self, service_name: str, wait: bool = True) -> Tuple[Optional[int], Optional[str]]:
@@ -120,7 +125,9 @@ class ServiceManager:
         process = Popen(['/usr/bin/s6-svc', '-wU', '-u', service_descriptor.service_dir], shell=False, stdout=PIPE, stderr=subprocess.STDOUT)
         if wait:
             stdout, stderr = process.communicate()
+            dbhelper.store_event(event_type=EventType.SERVICE_START, details=f"Service {service_name}; start command returned {process.returncode}.")
             return process.returncode, stdout.decode('utf-8')
+        dbhelper.store_event(event_type=EventType.SERVICE_START, details=f"Service {service_name}; start result not awaited.")
         return None, None
 
     def restart_service(self, service_name: str, wait: bool = True) -> Tuple[Optional[int], Optional[str]]:
@@ -131,7 +138,9 @@ class ServiceManager:
         process = Popen(['/usr/bin/s6-svc', '-wR', '-r', service_descriptor.service_dir], shell=False, stdout=PIPE, stderr=subprocess.STDOUT)
         if wait:
             stdout, stderr = process.communicate()
+            dbhelper.store_event(event_type=EventType.SERVICE_RESTART, details=f"Service {service_name}; restart command returned {process.returncode}.")
             return process.returncode, stdout.decode('utf-8')
+        dbhelper.store_event(event_type=EventType.SERVICE_RESTART, details=f"Service {service_name}; restart command not awaited.")
         return None, None
 
     def get_log(self, service_name: str, tail: Optional[int] = 100) -> List[str]:

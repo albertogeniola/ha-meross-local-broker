@@ -5,8 +5,10 @@ from meross_iot.model.enums import OnlineStatus
 from sqlalchemy import Column, String, BigInteger, Integer, DateTime, Boolean
 from sqlalchemy import ForeignKey, Enum
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from database import Base
 from sqlalchemy.inspection import inspect
+
 
 from model.enums import BridgeStatus, EventType
 
@@ -160,9 +162,16 @@ class Event(Base, Serializer):
     __table_args__ = {'sqlite_autoincrement': True}
     
     event_id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime, server_default=func.now())
     event_type = Column(Enum(EventType), nullable=False)
     device_uuid = Column(String, nullable=True)
     sub_device_id = Column(String, nullable=True)
     user_id = Column(String, nullable=True)
     details = Column(String, nullable=True)
+
+    
+    def serialize(self):
+        d = Serializer.serialize(self)
+        d['event_type'] = self.event_type.value
+        return d
     

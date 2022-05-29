@@ -22,22 +22,52 @@
         </a>
       </div>
       <p>Once done, click on the following button.</p>
-      <button mat-raised-button matStepperNext color="accent">I have installed the app</button>
+      <button mat-raised-button matStepperNext color="accent">I have installed the app &#8594;</button>
     </mat-step>
     <mat-step>
       <ng-template matStepLabel>Login with custom pairer</ng-template>
       <div class="login-step-container">
         <ul>
-          <li>Open the custom pairer app you just downloaded and select "Login to Meross Local Addon"</li>
-          <li>Enable WiFi and connect to the same network where this Homeassistant addon is running.</li>
+          <li><b>Open the app</b> (Custom Pairer) and select <b>Login to Meross Local Addon</b></li>
           <li>
-            Tap on "Discovery": the "HTTP server hostname" filed should auto-populate itself by discovering this addon.
-            <i>If this does not happen, get the hostname from the URL bar and specify the port 2002.</i>
+            Make sure <b>WiFi is enabled and connected</b> to the same network where Homeassistant is running. Please
+            note that you will also need to <b>enable location (gps)</b> for the discovery, as Android requires GPS
+            permissions to scan nearest WIFIs.
+          </li>
+          <li>
+            Tap on <b>Discovery</b>. This will auto-populate the <i>HTTP server hostname</i> input field. If this
+            doesn't work, then it is highly probable that either the App or Homeassistant are not on the same network.
+            In such cases, you need to identify the network address of the HomeAssistant instance and fill this value as
+            follows:
+            <pre>
+  http://HA_IP:ADDON_API_PORT
+
+  Where: 
+    - HA_IP is the IP address of the HomeAssistant device. The default is homeassistant.local.
+    - ADDON_API_PORT is the port, on the host of HA, where the Addon is listening. The default is 2002.
+            </pre>
           </li>
           <li>Fill in the username and email fileds with the values chosen during the Step 1.</li>
           <li>Tap on "Login", and make sure the login succeeds.</li>
         </ul>
-        <button mat-raised-button matStepperNext color="accent">Login succeeded</button>
+        <div>
+          <button
+            mat-raised-button
+            [color]="loginVerified ? 'primary' : 'accent'"
+            [disabled]="!loginVerified"
+            matStepperNext
+          >
+            <mat-icon>
+              <mat-spinner *ngIf="!loginVerified" color="warn" diameter="20" color="primary"></mat-spinner>
+              {{ loginVerified ? 'done' : '' }}
+            </mat-icon>
+            <span *ngIf="!loginVerified">Waiting for login...</span>
+            <span *ngIf="loginVerified">Login verified &#8594;</span>
+          </button>
+          <button *ngIf="!loginVerified" mat-button color="accent" matStepperNext>
+            or skip login verification &#8594;
+          </button>
+        </div>
       </div>
     </mat-step>
     <mat-step>

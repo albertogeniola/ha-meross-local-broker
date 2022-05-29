@@ -48,9 +48,9 @@ def register_service(service_name: str, service_name_template: str, service_type
     try:
         return _register_service(service_name=service_name, service_name_template=service_name_template, service_type=service_type, service_port=service_port, service_priority=service_priority, service_weight=service_weight, data=data)
     except DBusException as e:
-        print(f"An exception occrred: {str(e)}")
         # Raise any error except "already registered service"
         if not e.get_dbus_name()=="org.freedesktop.resolve1.DnssdServiceExists":
+            print(f"An unhandled exception occurred: {str(e)}")
             raise e
         
         # Handle already registered service
