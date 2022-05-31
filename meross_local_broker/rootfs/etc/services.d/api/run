@@ -5,8 +5,8 @@ ADVERTISE=$(get_option 'advertise' 'false')
 if [[ $ADVERTISE == "true" ]]; then
     # Advertising api_port service:
     bashio::log.info "Advertising the Meross API service"
-    api_port=$(bashio::addon.port 2002)
-    api_port=${api_port:-"2002"}
+    api_port=$(bashio::addon.ingress_port)
+    api_port=${api_port:-"8099"}
     bashio::log.debug "API_PORT=$api_port"
     /opt/custom_broker/mdns_register.py register meross_local_api meross_local_api _meross-api._tcp $api_port --update-if-present
 else

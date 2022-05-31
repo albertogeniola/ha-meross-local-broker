@@ -12,6 +12,7 @@ import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { User } from '@app/model/user';
+import { Configuration } from '@app/model/configuration';
 
 export interface SetNameDialogData {
   device: Device;
@@ -43,7 +44,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     // Update the device and subdevice lists once
     this.deviceStore.devices.subscribe((devices) => (this.deviceSource.data = devices));
     this.subdeviceStore.devices.subscribe((devices) => (this.subdeviceSource.data = devices));
-    this.adminService.getConfiguration().subscribe((account: User) => {
+    this.adminService.getConfiguration().subscribe((account: Configuration) => {
       this.unconfigured = !account;
     });
   }

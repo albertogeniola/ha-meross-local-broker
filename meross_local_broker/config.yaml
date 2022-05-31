@@ -12,11 +12,9 @@ arch:
 init: false
 ports:
   2001/tcp: 2001
-  2002/tcp: 2002
   10001/tcp: 10001
 ports_description:
   2001/tcp: "MQTT Broker port"
-  2002/tcp: "HTTP API port"
   10001/tcp: "Remote debugger port"
 ingress: true
 startup: services
