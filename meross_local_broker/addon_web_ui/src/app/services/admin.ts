@@ -39,7 +39,7 @@ export class AdminService {
       }
 
       // Parse the HTTP result message
-      this.snackBar.open(message);
+      this.snackBar.open(message, 'Dismiss', { duration: 2000 });
       return of(result as T);
     };
   }
