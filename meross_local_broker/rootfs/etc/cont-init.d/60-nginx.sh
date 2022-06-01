@@ -14,7 +14,7 @@ if [[ $ingress_interface = "" ]]; then
 fi
 
 if [[ $ingress_port = "" ]]; then
-    ingress_port="8099"
+    ingress_port="2003"
 fi
 
 if [[ $ingress_entry = "" ]]; then

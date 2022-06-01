@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bashio
-pushd /opt/custom_broker >/dev/null
 source /opt/utils/bashutils.sh
+pushd /opt/custom_broker >/dev/null
 
 DEBUG_MODE=$(get_option 'debug_mode' 'false')
 

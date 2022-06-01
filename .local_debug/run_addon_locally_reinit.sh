@@ -2,9 +2,8 @@
 # In order to run on the host-network, add the "--network host" parameter
 docker run --rm \
     --privileged \
-    -p 8099:8099/tcp \
+    -p 2003:2003/tcp \
     -p 2001:2001/tcp \
-    -p 2002:2002/tcp \
     -p 10001:10001/tcp \
     --env expose_admin_api=true \
     --env advertise=false \
