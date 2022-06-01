@@ -121,22 +121,21 @@ export class AdminService {
       .pipe(catchError(this.handleError('updateConfiguration', null)));
   }
 
-  // TODO: pass query string parameters
   getEvents(fromTimestamp?: Date, toTimestamp?: Date, limit?: number): Observable<Event[]> {
     var headers = new HttpHeaders();
     headers.append('Content-Type', 'application/json; charset=utf-8');
     let params = new HttpParams();
     if (fromTimestamp != null) {
-      params.append('fromTimestamp', '' + fromTimestamp.getTime());
+      params = params.append('fromTimestamp', '' + fromTimestamp.getTime() / 1000);
     }
     if (toTimestamp != null) {
-      params.append('toTimestamp', '' + toTimestamp.getTime());
+      params = params.append('toTimestamp', '' + toTimestamp.getTime() / 1000);
     }
     if (limit != null) {
-      params.append('limit', '' + limit);
+      params = params.append('limit', '' + limit);
     }
     return this.http
-      .get<Event[]>(environment.backend + '/_admin_/events', { headers })
+      .get<Event[]>(environment.backend + '/_admin_/events', { headers: headers, params: params })
       .pipe(catchError(this.handleError('getEvents', null)));
   }
 

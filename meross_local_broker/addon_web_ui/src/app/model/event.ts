@@ -24,9 +24,9 @@ export enum DeviceOnlineStatus {
 export interface Event {
   readonly event_id: DeviceOnlineStatus;
   readonly timestamp: Date;
-  readonly event_type: string;
-  readonly device_uuid: string;
-  readonly sub_device_id: string;
-  readonly user_id: string;
+  readonly eventType: string;
+  readonly deviceUuid: string;
+  readonly subDeviceId: string;
+  readonly userId: string;
   readonly details: string;
 }

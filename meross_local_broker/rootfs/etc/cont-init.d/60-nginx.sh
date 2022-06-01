@@ -1,5 +1,6 @@
 #!/usr/bin/with-contenv bashio
 source /opt/utils/bashutils.sh
+
 # ==============================================================================
 # Configure NGINX for use with Meross Local Broker
 # ==============================================================================

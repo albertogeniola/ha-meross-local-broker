@@ -2,7 +2,7 @@
   <mat-vertical-stepper linear="true" #stepper id="stepper">
     <mat-step>
       <ng-template matStepLabel>Credentials configuration</ng-template>
-      <configuration-account (configurationUpdatedEvent)="stepper.next()"></configuration-account>
+      <configuration-account (configurationUpdatedEvent)="onConfigurationUpdate()"></configuration-account>
       <!--<button mat-button matStepperNext>Next</button>-->
     </mat-step>
     <mat-step>
