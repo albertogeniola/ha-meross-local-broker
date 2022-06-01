@@ -13,9 +13,11 @@ init: false
 ports:
   2001/tcp: 2001
   10001/tcp: 10001
+  8099/tcp: 8099
 ports_description:
   2001/tcp: "MQTT Broker port"
   10001/tcp: "Remote debugger port"
+  8099/tcp: "API Server port"
 ingress: true
 startup: services
 panel_icon: mdi:power-socket-us
