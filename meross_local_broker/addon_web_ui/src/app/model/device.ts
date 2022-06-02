@@ -19,17 +19,17 @@ export interface DeviceChannel {
 export interface Device {
   readonly mac: string;
   readonly uuid: string;
-  readonly device_type: string;
-  readonly sub_type: string;
-  readonly fmware_version: string;
-  readonly hdware_version: string;
-  readonly user_id: string;
-  readonly online_status: DeviceOnlineStatus;
-  readonly last_seen_time: Date;
-  readonly local_ip: string;
+  readonly deviceType: string;
+  readonly subType: string;
+  readonly fmwareVersion: string;
+  readonly hdwareVersion: string;
+  readonly userId: string;
+  readonly onlineStatus: DeviceOnlineStatus;
+  readonly lastSeenTime: Date;
+  readonly localIp: string;
   readonly channels: DeviceChannel[];
-  dev_name: string;
+  devName: string;
   domain: string;
-  reserved_domain: string;
-  bridge_status: BridgeStatus;
+  reservedDomain: string;
+  bridgeStatus: BridgeStatus;
 }

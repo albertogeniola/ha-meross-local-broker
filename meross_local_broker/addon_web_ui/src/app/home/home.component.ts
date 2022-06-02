@@ -58,10 +58,6 @@ export class HomeComponent implements AfterViewInit, OnInit {
     const dialogRef = this.dialog.open(SetDeviceNameDialog, {
       data: { device: device },
     });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      console.log('The dialog was closed');
-    });
   }
 }
 
