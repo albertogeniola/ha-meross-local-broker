@@ -10,7 +10,7 @@ if [[ $DEBUG_MODE == "true" ]]; then
   bashio::log.info "Setting flask debug flags"
   export ENABLE_DEBUG=True
   debug_port=$(bashio::addon.port '10001')
-  debug_port=${debug_port:-"2001"}
+  debug_port=${debug_port:-"10001"}
   export DEBUG_PORT=$debug_port
   exec python3 -m debugpy --listen 0.0.0.0:$DEBUG_PORT ./http_api.py
 else
