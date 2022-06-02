@@ -112,12 +112,9 @@ jobs:
           npm run-script build
       - name: Extract version
         id: set_version
+        working-directory: meross_local_broker
         run: |
-          ls -l
-          ls -l /data
-          ls -l /data/${{ matrix.addon }}
-          ls -l ./${{ matrix.addon }}
-          version="$(jq --raw-output '.version' "/data/${{ matrix.addon }}/config.json").${{ github.run_attempt }}"
+          version="$(yq '.version' "config.yaml").${{ github.run_attempt }}"
           echo "::set-output name=dev_version::$version
           echo "::debug::Version set to $version"
       - name: Build ${{ matrix.addon }} add-on
