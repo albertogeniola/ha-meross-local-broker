@@ -1,5 +1,5 @@
 <div class="container">
-  <mat-vertical-stepper linear="true" #stepper id="stepper">
+  <mat-vertical-stepper [linear]="!configured" #stepper id="stepper">
     <mat-step>
       <ng-template matStepLabel>Credentials configuration</ng-template>
       <configuration-account (configurationUpdatedEvent)="onConfigurationUpdate()"></configuration-account>
@@ -25,7 +25,7 @@
       <button mat-raised-button matStepperNext color="accent">I have installed the app &#8594;</button>
     </mat-step>
     <mat-step>
-      <ng-template matStepLabel>Login with custom pairer</ng-template>
+      <ng-template matStepLabel>Login with custom pairer <span class="small">TEST</span></ng-template>
       <div class="login-step-container">
         <ul>
           <li><b>Open the app</b> (Custom Pairer) and select <b>Login to Meross Local Addon</b></li>
@@ -70,8 +70,8 @@
         </div>
       </div>
     </mat-step>
-    <mat-step>
-      <ng-template matStepLabel>Par Meross devices</ng-template>
+    <mat-step optional>
+      <ng-template matStepLabel>Pair Meross devices</ng-template>
       <div class="pair-step-container">
         <p>You can now pair your Meross hardware devices with this local addon.</p>
         <p>To do so, select the "Pair" option from the Meross Pairer menu and follow the app procedure.</p>
@@ -85,7 +85,10 @@
       <div class="ha-step-container">
         <p>
           You can now install and configure the Homeassistant Meross component to use this local addon as server rather
-          than the Official Meross cloud. (TBD)
+          than the Official Meross cloud. To do so, please refer to the installation instructions
+          <a href="https://github.com/albertogeniola/meross-homeassistant#installation--configuration" target="_blank"
+            >here</a
+          >.
         </p>
       </div>
     </mat-step>
