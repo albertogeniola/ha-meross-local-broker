@@ -41,13 +41,12 @@ class User(Base, Serializer):
     mqtt_key = Column(String(64))
     owned_devices = relationship("Device", back_populates="owner_user")
 
-    def __init__(self, email: str, salt: str, password: str, mqtt_key: str, user_id: Optional[int], enable_meross_link: Optional[bool] = False, *args, **kwargs):
+    def __init__(self, email: str, salt: str, password: str, mqtt_key: str, user_id: Optional[int], *args, **kwargs):
         self.email = email
         self.salt = salt
         self.password = password
         self.mqtt_key = mqtt_key
         self.user_id = user_id
-        self.enable_meross_link = enable_meross_link
 
     def __repr__(self):
         return '<User %r (%r)>' % (self.user_id, self.email)
