@@ -113,7 +113,11 @@ jobs:
       - name: Extract version
         id: set_version
         run: |
-          version="$(jq --raw-output '.version' "./${{ matrix.addon }}/config.json").${{ github.run_attempt }}"
+          ls -l
+          ls -l /data
+          ls -l /data/${{ matrix.addon }}
+          ls -l ./${{ matrix.addon }}
+          version="$(jq --raw-output '.version' "/data/${{ matrix.addon }}/config.json").${{ github.run_attempt }}"
           echo "::set-output name=dev_version::$version
           echo "::debug::Version set to $version"
       - name: Build ${{ matrix.addon }} add-on
