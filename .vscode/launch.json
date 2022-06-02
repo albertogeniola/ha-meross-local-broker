@@ -8,12 +8,12 @@
       "name": "RASPBERRY PI - REMOTE",
       "type": "python",
       "request": "attach",
-      "port": 6789,
+      "port": 10001,
       "host": "192.168.1.22",
       "pathMappings": [
         {
-          "localRoot": "C:\\Users\\Alberto Geniola\\source\\repos\\ha-meross-local-broker",
-          "remoteRoot": "/config"
+          "localRoot": "C:\\Users\\Alberto Geniola\\source\\repos\\ha-meross-local-broker\\meross_local_broker\\rootfs\\opt\\custom_broker",
+          "remoteRoot": "/opt/custom_broker"
         }
       ]
     },

@@ -1,1 +1,20 @@
 *.sh text eol=lf
+
+# init.d service scripts
+/meross_local_broker/rootfs/etc/cont-init.d/*.sh text eol=lf
+
+# services.d scripts
+/meross_local_broker/rootfs/etc/services.d/api/* text eol=lf
+/meross_local_broker/rootfs/etc/services.d/api/log/* text eol=lf
+/meross_local_broker/rootfs/etc/services.d/broker/* text eol=lf
+/meross_local_broker/rootfs/etc/services.d/broker/log/* text eol=lf
+/meross_local_broker/rootfs/etc/services.d/mosquitto/* text eol=lf
+/meross_local_broker/rootfs/etc/services.d/mosquitto/log/* text eol=lf
+/meross_local_broker/rootfs/etc/services.d/nginx/* text eol=lf
+/meross_local_broker/rootfs/etc/services.d/nginx/log/* text eol=lf
+
+# Bin startup scripts
+/meross_local_broker/rootfs/usr/local/bin/*.sh text eol=lf
+
+# MDNS register utility
+/meross_local_broker/rootfs/opt/custom_broker/mdns_register.py text eol=lf

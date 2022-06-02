@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatStepper } from '@angular/material/stepper';
+import { Configuration } from '@app/model/configuration';
 import { AdminService } from '@app/services/admin';
 
 @Component({
@@ -11,12 +12,17 @@ import { AdminService } from '@app/services/admin';
 export class WizardComponent implements OnInit {
   @ViewChild('stepper') stepper!: MatStepper;
   public loginVerified: boolean = false;
+  public configured: boolean = false;
   private loginEventPoller: number = null;
   private lastTimestamp: Date = null;
 
   constructor(private adminService: AdminService, private snackBar: MatSnackBar) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.adminService.getConfiguration().subscribe((conf: Configuration) => {
+      this.configured = conf != null;
+    });
+  }
 
   onConfigurationUpdate() {
     // When the configuration is updated, proceed to the next
