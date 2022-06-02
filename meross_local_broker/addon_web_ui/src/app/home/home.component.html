@@ -32,8 +32,8 @@
                 </mat-menu>
               </div>
               <div>
-                <a *ngIf="element.dev_name === null" (click)="assignName(element)" class="grayout">(No name set)</a>
-                <span *ngIf="element.dev_name !== null">{{ element.dev_name }}</span>
+                <a *ngIf="element.devName === null" (click)="assignName(element)" class="grayout">(No name set)</a>
+                <span *ngIf="element.devName !== null">{{ element.devName }}</span>
                 <br />
                 <span class="mat-small">{{ element.uuid }}</span>
               </div>
@@ -43,30 +43,30 @@
 
         <ng-container matColumnDef="type">
           <th class="p10" mat-header-cell *matHeaderCellDef mat-sort-header>Device Type</th>
-          <td class="p10" mat-cell *matCellDef="let element">{{ element.device_type }}</td>
+          <td class="p10" mat-cell *matCellDef="let element">{{ element.deviceType }}</td>
         </ng-container>
 
         <ng-container matColumnDef="network">
           <th class="p10" mat-header-cell *matHeaderCellDef mat-sort-header>Network Info</th>
           <td class="p10" mat-cell *matCellDef="let element">
             <span class="mat-small">{{ element.mac }}</span>
-            <span class="mat-small" *ngIf="element.local_ip"><br />({{ element.local_ip }})</span>
+            <span class="mat-small" *ngIf="element.localIp"><br />({{ element.localIp }})</span>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="userId">
           <th class="p10" mat-header-cell *matHeaderCellDef mat-sort-header>User Id</th>
           <td class="p10" mat-cell *matCellDef="let element">
-            {{ element.user_id }}
+            {{ element.userId }}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="status">
           <th class="p10" mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-          <td class="p10" mat-cell *matCellDef="let element" [matTooltip]="'Last message on ' + element.last_seen_time">
-            <span>{{ element.online_status | onlineDeviceStatusName }}</span
+          <td class="p10" mat-cell *matCellDef="let element" [matTooltip]="'Last message on ' + element.lastSeenTime">
+            <span>{{ element.onlineStatus | onlineDeviceStatusName }}</span
             ><br />
-            <span class="small">Bridge: {{ element.bridge_status | bridgeStatusName }}</span>
+            <span class="small">Meross Link: {{ element.bridgeStatus | bridgeStatusName }}</span>
           </td>
         </ng-container>
 
@@ -93,24 +93,24 @@
         <ng-container matColumnDef="subdeviceId">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Subdevice Name/Id</th>
           <td mat-cell *matCellDef="let element">
-            <span *ngIf="element.sub_device_name">{{ element.sub_device_name }}</span>
-            <span *ngIf="!element.sub_device_name">Unknown</span>
+            <span *ngIf="element.subDeviceName">{{ element.subDeviceName }}</span>
+            <span *ngIf="!element.subDeviceName">Unknown</span>
             <br />
-            <span class="mat-small">{{ element.sub_device_id }}</span>
+            <span class="mat-small">{{ element.subDeviceId }}</span>
           </td>
         </ng-container>
 
         <!-- Subdevice Type Column -->
         <ng-container matColumnDef="type">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Subdevice Type</th>
-          <td mat-cell *matCellDef="let element">{{ element.sub_device_type }}</td>
+          <td mat-cell *matCellDef="let element">{{ element.subDeviceType }}</td>
         </ng-container>
 
         <!-- Subdevice HubId Column -->
         <ng-container matColumnDef="hubId">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Hub UUID</th>
           <td mat-cell *matCellDef="let element">
-            <span class="mat-small">{{ element.hub_uuid }}</span>
+            <span class="mat-small">{{ element.hubUuid }}</span>
           </td>
         </ng-container>
 

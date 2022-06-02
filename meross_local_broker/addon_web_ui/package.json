@@ -1,6 +1,6 @@
 {
   "name": "meross-local-broker",
-  "version": "0.0.1",
+  "version": "0.0.1-rc0",
   "private": true,
   "scripts": {
     "ng": "ng",

@@ -52,7 +52,7 @@ export class AdminService {
       .pipe(
         map((device) => {
           // Convert date
-          device.last_seen_time = new Date(device.last_seen_time);
+          device.lastSeenTime = new Date(device.lastSeenTime);
           return device as Device;
         }, catchError(this.handleError<Device>('updateDevice', null)))
       );
@@ -67,7 +67,7 @@ export class AdminService {
         map((devices) =>
           devices.map((device) => {
             // Convert date
-            device.last_seen_time = new Date(device.last_seen_time);
+            device.lastSeenTime = new Date(device.lastSeenTime);
             return device as Device;
           })
         ),
