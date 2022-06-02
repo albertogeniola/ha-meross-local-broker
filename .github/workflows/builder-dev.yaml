@@ -115,7 +115,7 @@ jobs:
         working-directory: meross_local_broker
         run: |
           version="$(yq '.version' 'config.yaml').${{ github.run_attempt }}"
-          echo "::set-output name=dev_version::$version
+          echo "::set-output name=dev_version::$version"
           echo "::debug::Version set to $version"
       - name: Build ${{ matrix.addon }} add-on
         if: steps.check.outputs.build_arch == 'true'
