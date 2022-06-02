@@ -29,9 +29,7 @@ options:
   reinit_db: false
   advertise: true
   debug_mode: false
-  debug_port: 10001
 schema:
   reinit_db: "bool"
   advertise: "bool"
   debug_mode: "bool"
-  debug_port: "int"
