@@ -2,16 +2,12 @@ import { Component, AfterViewInit, ViewChild, OnInit, Inject } from '@angular/co
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
-import { finalize } from 'rxjs/operators';
-import { Device, DeviceOnlineStatus } from '@app/model/device';
+import { Device } from '@app/model/device';
 import { DeviceStore } from '@app/providers/device';
 import { Subdevice } from '@app/model/subdevice';
 import { SubdeviceStore } from '@app/providers/subdevice';
 import { AdminService } from '@app/services/admin';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
-import { Observable, Subscription } from 'rxjs';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { User } from '@app/model/user';
 import { Configuration } from '@app/model/configuration';
 
 export interface SetNameDialogData {
@@ -73,7 +69,7 @@ export class SetDeviceNameDialog {
     private deviceStore: DeviceStore,
     @Inject(MAT_DIALOG_DATA) public data: SetNameDialogData
   ) {
-    this.newDeviceName = data.device.dev_name;
+    this.newDeviceName = data.device.devName;
   }
 
   onNoClick(): void {
@@ -83,7 +79,7 @@ export class SetDeviceNameDialog {
   setDeviceName(): void {
     this.deviceStore.updateDeviceName(this.data.device.uuid, this.newDeviceName).subscribe((d) => {
       if (d !== null) {
-        this.data.device.dev_name = this.newDeviceName;
+        this.data.device.devName = this.newDeviceName;
       }
       this.dialogRef.close();
     });
