@@ -7,7 +7,7 @@ DEBUG_MODE=$(get_option 'debug_mode' 'false')
 # Start flask
 bashio::log.info "Starting flask..."
 if [[ $DEBUG_MODE == "true" ]]; then
-  bashio::log.info "Setting flask debug flags"
+  bashio::log.warning "Setting flask debug flags"
   export ENABLE_DEBUG=True
   debug_port=$(bashio::addon.port '10001')
   debug_port=${debug_port:-"10001"}
