@@ -63,7 +63,7 @@
 
         <ng-container matColumnDef="status">
           <th class="p10" mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-          <td class="p10" mat-cell *matCellDef="let element" [matTooltip]="'Last message on ' + element.lastSeenTime">
+          <td class="p10" mat-cell *matCellDef="let element" [matTooltip]="'Last message on ' + element.lastS.eenTime">
             <span>{{ element.onlineStatus | onlineDeviceStatusName }}</span
             ><br />
             <span class="small">Meross Link: {{ element.bridgeStatus | bridgeStatusName }}</span>

@@ -7,6 +7,7 @@ from meross_iot.model.http.exception import HttpApiError
 
 from blueprints.admin import admin_blueprint
 from blueprints.auth import auth_blueprint
+from blueprints.log import log_blueprint
 from blueprints.device import device_blueprint
 from blueprints.devs import devs_blueprint
 from blueprints.hub import hub_blueprint
@@ -26,6 +27,7 @@ CORS(app)  # TODO: Fix this. Maybe we can restrict the origin access. In case we
 
 # Register flask blueprints
 app.register_blueprint(auth_blueprint, url_prefix="/v1/Auth")
+app.register_blueprint(log_blueprint, url_prefix="/v1/log")
 app.register_blueprint(profile_blueprint, url_prefix="/v1/Profile")
 app.register_blueprint(device_blueprint, url_prefix="/v1/Device")
 app.register_blueprint(hub_blueprint, url_prefix='/v1/Hub')
