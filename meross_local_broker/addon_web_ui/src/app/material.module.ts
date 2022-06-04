@@ -49,6 +49,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatTreeModule } from '@angular/material/tree';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 @NgModule({
   exports: [
@@ -92,6 +93,7 @@ import { MatTreeModule } from '@angular/material/tree';
     MatTooltipModule,
     ReactiveFormsModule,
     MatTreeModule,
+    ClipboardModule,
   ],
 })
 export class MaterialModule {}

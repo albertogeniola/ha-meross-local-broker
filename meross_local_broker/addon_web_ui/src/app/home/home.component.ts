@@ -9,6 +9,7 @@ import { SubdeviceStore } from '@app/providers/subdevice';
 import { AdminService } from '@app/services/admin';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Configuration } from '@app/model/configuration';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface SetNameDialogData {
   device: Device;
@@ -34,6 +35,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     private deviceStore: DeviceStore,
     private subdeviceStore: SubdeviceStore,
     private adminService: AdminService,
+    private snackBarService: MatSnackBar,
     public dialog: MatDialog
   ) {}
   ngOnInit(): void {
@@ -43,6 +45,10 @@ export class HomeComponent implements AfterViewInit, OnInit {
     this.adminService.getConfiguration().subscribe((account: Configuration) => {
       this.unconfigured = !account;
     });
+  }
+
+  alertCopied(): void {
+    this.snackBarService.open('Device uuid copied to clipboard.', 'ok', { duration: 2000 });
   }
 
   ngAfterViewInit() {

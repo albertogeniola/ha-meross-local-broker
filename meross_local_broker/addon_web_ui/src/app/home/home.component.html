@@ -35,7 +35,14 @@
                 <a *ngIf="element.devName === null" (click)="assignName(element)" class="grayout">(No name set)</a>
                 <span *ngIf="element.devName !== null">{{ element.devName }}</span>
                 <br />
-                <span class="mat-small">{{ element.uuid }}</span>
+                <a
+                  (click)="alertCopied()"
+                  #tooltip
+                  class="mat-small"
+                  [matTooltip]="element.uuid + ' (click to copy)'"
+                  [cdkCopyToClipboard]="element.uuid"
+                  >{{ element.uuid | slice: 0:3 }}...{{ element.uuid | slice: -8 }}</a
+                >
               </div>
             </div>
           </td>
@@ -63,7 +70,7 @@
 
         <ng-container matColumnDef="status">
           <th class="p10" mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-          <td class="p10" mat-cell *matCellDef="let element" [matTooltip]="'Last message on ' + element.lastS.eenTime">
+          <td class="p10" mat-cell *matCellDef="let element" [matTooltip]="'Last message on ' + element.lastSeenTime">
             <span>{{ element.onlineStatus | onlineDeviceStatusName }}</span
             ><br />
             <span class="small">Meross Link: {{ element.bridgeStatus | bridgeStatusName }}</span>
