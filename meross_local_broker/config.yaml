@@ -1,5 +1,5 @@
 name: "Meross Local Broker Addon"
-version: "0.0.1-alpha39"
+version: "0.0.1-alpha40"
 description: "Enables LAN-ONLY broker, avoiding Meross Cloud usage."
 slug: "meross_local_broker"
 image: "ghcr.io/albertogeniola/{arch}-meross_local_broker"
@@ -10,6 +10,7 @@ arch:
   - armv7
   - i386
 init: false
+host_network: true
 ports:
   2001/tcp: 2001
   2003/tcp: 2003
