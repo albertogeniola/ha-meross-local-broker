@@ -8,7 +8,7 @@ if [[ $ADVERTISE == "true" ]]; then
     mosquitto_port=$(bashio::addon.port 2001)
     mosquitto_port=${mosquitto_port:-"2001"}
     bashio::log.debug "MOSQUITTO_PORT=$mosquitto_port"
-    /opt/custom_broker/mdns_register.py register meross_local_mqtt meross_local_mqtt _meross-mqtt._tcp $mosquitto_port --update-if-present
+    /opt/custom_broker/mdns_register.py register meross_local_mqtt meross_local_mqtt _meross-mqtt._tcp. $mosquitto_port --update-if-present
 else
     bashio::log.warning "Advertising disabled. The Meross MQTT service won't be advertised via MDNS."
 fi
