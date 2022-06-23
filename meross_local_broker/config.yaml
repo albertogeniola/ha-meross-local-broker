@@ -20,8 +20,6 @@ ports_description:
   10001/tcp: "Remote debugger port"
 ingress: true
 ingress_port: 2003
-#ingress_port: 0
-#host_network: true
 startup: services
 panel_icon: mdi:power-socket-us
 panel_title: Local Meross Broker
