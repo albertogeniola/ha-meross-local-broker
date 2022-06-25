@@ -1,3 +1,3 @@
-## 0.0.1-alpha44
+## 0.0.1-alpha45
 
-- Configured addon to run on internal network rather than on host-network
+- Fix meross link parameter being ingored at configuration phase
