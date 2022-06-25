@@ -100,7 +100,7 @@ jobs:
       - name: Setup Node
         if: steps.check.outputs.build_arch == 'true'
         id: setup_node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 12
 
