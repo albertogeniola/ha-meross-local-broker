@@ -14,14 +14,6 @@ else
   debug=""
 fi
 
-#bridging=$(bashio::config 'federate_with_meross')
-#if [[ $bridging == true ]]; then
-#  bashio::log.info "Enabling Meross bridging"
-#  bridging="--enable-bridging"
-#else
-#  bridging=""
-#fi
-
 # Generate a random password for agent user
 AGENT_USERNAME="_agent"
 AGENT_PASSWORD=$(openssl rand -base64 32)
