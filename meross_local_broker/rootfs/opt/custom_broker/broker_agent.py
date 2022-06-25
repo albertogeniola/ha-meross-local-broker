@@ -45,7 +45,6 @@ def parse_args():
     parser.add_argument('--password', type=str, required=True, help='MQTT password')
     parser.add_argument('--debug', dest='debug', action='store_true', help='When set, prints debug messages')
     parser.add_argument('--cert-ca', required=True, type=str, help='Path to the root CA certificate path')
-    parser.add_argument('--enable-bridging', action="store_true", help='When set, enabled Meross Broker bridging')
     parser.set_defaults(debug=False)
     parser.set_defaults(enable_bridging=False)
     return parser.parse_args()
@@ -422,12 +421,19 @@ def main():
     # Set all devices to unknown online status
     dbhelper.reset_device_online_status()
 
+    # Check if we need to enable the bridging feature
+    enable_meross_bridge = False
+    conf = dbhelper.get_configuration()
+    if conf is not None and conf.enable_meross_link:
+        l.info("Enabling meross bridging as per saved configuration")
+        enable_meross_bridge = True
+
     b = Broker(hostname=args.host,
                port=args.port,
                username=args.username,
                password=args.password,
                cert_ca=args.cert_ca,
-               enable_bridging=args.enable_bridging)
+               enable_bridging=enable_meross_bridge)
 
     reconnect_interval = 10  # [seconds]
     while True:
