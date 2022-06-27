@@ -119,7 +119,7 @@ jobs:
           echo "::debug::Version set to $version"
       - name: Build ${{ matrix.addon }} add-on
         if: steps.check.outputs.build_arch == 'true'
-        uses: home-assistant/builder@2022.03.1
+        uses: home-assistant/builder@2022.06.2
         with:
           args: |
             ${{ env.BUILD_ARGS }} \
