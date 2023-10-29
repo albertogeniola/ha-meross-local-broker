@@ -14,7 +14,6 @@ on:
 
 jobs:
   build:
-    needs: init
     runs-on: ubuntu-latest
     name: Build ${{ matrix.arch }} ${{ matrix.addon }} add-on
     strategy:
