@@ -1,7 +1,7 @@
 name: Builder
 
 env:
-  BUILD_ARGS: "--test"
+  BUILD_ARGS: ""
   MONITORED_FILES: "build.yaml config.yaml Dockerfile rootfs addon_web_ui"
 
 on:
