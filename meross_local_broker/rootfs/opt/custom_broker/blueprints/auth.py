@@ -14,6 +14,7 @@ auth_blueprint = Blueprint('auth', __name__)
 _LOGGER = get_logger(__name__)
 
 
+@auth_blueprint.route('/signIn', methods=['POST'])
 @auth_blueprint.route('/Login', methods=['POST'])
 @meross_http_api(login_required=False)
 def login(api_payload: Dict, *args, **kwargs):
@@ -35,8 +36,3 @@ def login(api_payload: Dict, *args, **kwargs):
     }
     return make_api_response(data=data)
 
-
-@auth_blueprint.route('/signIn', methods=['POST'])
-@meross_http_api(login_required=False)
-def login_new(api_payload: Dict, *args, **kwargs):
-    return login(api_payload=api_payload, *args, **kwargs)
