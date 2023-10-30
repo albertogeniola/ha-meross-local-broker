@@ -134,6 +134,9 @@ RUN pip3 install -r requirements.txt
 
 WORKDIR /
 COPY rootfs /
+COPY --chown=mosquitto:mosquitto --chmod=0755 rootfs/etc/mosquitto/certs /etc/mosquitto/
+
+
 RUN mkdir -p /var/run/mdns/meross-mqtt && mkdir -p /var/run/mdns/meross-http-api
 
 RUN chmod +x /usr/local/bin/*.sh
