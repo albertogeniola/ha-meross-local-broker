@@ -3,7 +3,7 @@ from meross_iot.model.http.exception import HttpApiError
 from logger import get_logger
 from typing import Dict
 
-from flask import Blueprint
+from flask import Blueprint, request
 
 from authentication import _user_login
 from decorator import meross_http_api
@@ -32,7 +32,9 @@ def login(api_payload: Dict, *args, **kwargs):
         "token": str(token.token),
         "key": str(user.mqtt_key),
         "userid": str(user.user_id),
-        "email": str(user.email)
+        "email": str(user.email),
+        "domain": str(request.scheme + "://" + request.host),
+        "mqttDomain": "",
+        "mfaLockExpire": 0
     }
     return make_api_response(data=data)
-

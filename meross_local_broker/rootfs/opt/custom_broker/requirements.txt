@@ -3,7 +3,7 @@ SQLAlchemy==1.4.3
 paho-mqtt==1.5.1
 asyncio-mqtt==0.8.1
 flask-cors==3.0.10
-meross_iot==0.4.4.4
+meross_iot==0.4.6.0
 expiringdict==1.2.1
 dbus-python==1.2.18
 debugpy

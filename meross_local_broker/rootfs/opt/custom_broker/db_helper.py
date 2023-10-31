@@ -27,14 +27,14 @@ class DbHelper:
                 # Prefer using an empty KEY rather than a randomized one
                 user_key = ''
             salt = ''.join(random.choice(BASE62_ALPHABET) for i in range(16))
-            hashed_pass = _hash_password(salt=salt, password=password)
+            hashed_pass = _hash_password(salt=salt, password=password, pre_apply_md5=True)
             u = User(email=email, user_id=user_id, salt=salt, password=hashed_pass, mqtt_key=user_key)
             self._s.add(u)
             self._s.commit()
         else:
             l.warning(f"User %s already exists. Updating its password/userid/mqttkey...", email)
             salt = u.salt
-            hashed_pass = _hash_password(salt=salt, password=password)
+            hashed_pass = _hash_password(salt=salt, password=password, pre_apply_md5=True)
             u.email = email
             u.password = hashed_pass
             if user_key is not None:

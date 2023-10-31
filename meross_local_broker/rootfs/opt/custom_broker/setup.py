@@ -20,7 +20,7 @@ def get_meross_credentials(email: str, password: str) -> MerossCloudCreds:
     import asyncio
 
     async def get_creds(email: str = email, password: str = password) -> MerossCloudCreds:
-        creds = await MerossHttpClient.async_login(email=email, password=password)
+        creds = await MerossHttpClient.async_login(api_base_url="https://iotx-us.meross.com", email=email, password=password)
         return creds
     return asyncio.run(get_creds(email=email, password=password))
 
