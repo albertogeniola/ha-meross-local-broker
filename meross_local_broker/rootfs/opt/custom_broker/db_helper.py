@@ -34,7 +34,7 @@ class DbHelper:
         else:
             l.warning(f"User %s already exists. Updating its password/userid/mqttkey...", email)
             salt = u.salt
-            hashed_pass = _hash_password(salt=salt, password=password, pre_apply_md5=True)
+            hashed_pass = _hash_password(salt=salt, password=password)
             u.email = email
             u.password = hashed_pass
             if user_key is not None:

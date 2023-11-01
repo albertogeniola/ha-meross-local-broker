@@ -35,7 +35,10 @@ def setup_account(email: str, password: str, enable_meross_link: bool) -> User:
         user_id = int(creds.user_id)
         user_key = creds.key
 
-    user = dbhelper.add_update_user(user_id=user_id, email=email, password=password, user_key=user_key)
+    # The new version of Meross API uses a hashed password as clear password (md5)
+    #  We do the same to maintain compatibility with low-level MerossIot API
+    hashed_pass = md5(password.encode("utf8")).hexdigest()
+    user = dbhelper.add_update_user(user_id=user_id, email=email, password=hashed_pass, user_key=user_key)
     dbhelper.add_update_configuration(enable_meross_link=enable_meross_link, local_user_id=user.user_id)
     l.info(f"User: %s, mqtt_key: %s", user.email, user.mqtt_key)
     dbhelper.store_event(event_type=EventType.CONFIGURATION_CHANGE, details=f"Login username/password has been changed.")

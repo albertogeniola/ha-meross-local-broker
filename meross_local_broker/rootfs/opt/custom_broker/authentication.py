@@ -24,7 +24,7 @@ def _user_logout(token: str) -> None:
     dbhelper.remove_user_token(token=token)
     dbhelper.store_event(EventType.USER_LOGOUT, details=f"User {user.email} has failed to log in via Local Meross API: wrong or unexisting email specified.", user_id=user.user_id);
 
-def _user_login(email: str, password: str) -> Tuple[User, UserToken]:
+def _user_login(email: str, password: str, providing_pre_hashed_password: bool) -> Tuple[User, UserToken]:
     # Check user-password creds
     # email, userid, salt, password, mqtt_key
     user = dbhelper.get_user_by_email(email=email)
@@ -32,7 +32,8 @@ def _user_login(email: str, password: str) -> Tuple[User, UserToken]:
         dbhelper.store_event(EventType.USER_LOGIN_FAILURE, details=f"User {email} has failed to log in via Local Meross API: wrong or unexisting email specified.");
         raise HttpApiError(ErrorCodes.CODE_UNEXISTING_ACCOUNT)
 
-    computed_hashed_password = _hash_password(salt=user.salt, password=password)
+    # If not provided with a pre-md5-hashed password, we compute it via _hash_password.
+    computed_hashed_password = _hash_password(salt=user.salt, password=password, pre_apply_md5 = not providing_pre_hashed_password)
 
     if computed_hashed_password != user.password:
         dbhelper.store_event(EventType.USER_LOGIN_FAILURE, details=f"User {email} has failed to log in via Local Meross API: wrong password.");
