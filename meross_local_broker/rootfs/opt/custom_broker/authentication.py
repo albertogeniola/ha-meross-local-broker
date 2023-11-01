@@ -1,3 +1,4 @@
+from hashlib import md5
 import uuid
 from _sha256 import sha256
 from typing import Tuple, Optional
@@ -23,6 +24,23 @@ def _user_logout(token: str) -> None:
     user = dbhelper.get_user_by_token(token=token)
     dbhelper.remove_user_token(token=token)
     dbhelper.store_event(EventType.USER_LOGOUT, details=f"User {user.email} has failed to log in via Local Meross API: wrong or unexisting email specified.", user_id=user.user_id);
+
+
+def _attempt_password_upgrade(email, password) -> bool:
+    # Attempt password upgrade from non-hashed to hashed form
+    user = dbhelper.get_user_by_email(email=email)
+    if user is None:
+        dbhelper.store_event(EventType.USER_LOGIN_FAILURE, details=f"User {email} has failed to log in via Local Meross API: wrong or unexisting email specified.");
+        return False
+    # Only upgrade the password if user hasn't done it yet and if the old password still is valid
+    old_password = _hash_password(salt=user.salt, password=password, pre_apply_md5=False)
+    if not user.password_upgraded and user.password == old_password:
+        new_pass = md5(password.encode("utf8")).hexdigest()
+        dbhelper.add_update_user(email=user.email, password=new_pass, user_key=None)
+        dbhelper.store_event(EventType.USER_PASSWORD_UPGRADE, details=f"User's password has been upgraded for {email}.");
+        return True
+    return False
+
 
 def _user_login(email: str, password: str, providing_pre_hashed_password: bool) -> Tuple[User, UserToken]:
     # Check user-password creds

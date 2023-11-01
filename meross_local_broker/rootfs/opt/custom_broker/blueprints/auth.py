@@ -1,13 +1,16 @@
+import re
+from enum import StrEnum
 from meross_iot.model.http.exception import HttpApiError
 
 from logger import get_logger
-from typing import Dict
+from typing import Dict, Optional, Tuple
 
 from flask import Blueprint, request
 
-from authentication import _user_login
+from authentication import _attempt_password_upgrade, _user_login
 from decorator import meross_http_api
 from messaging import make_api_response
+from pep440_rs import Version
 
 
 auth_blueprint = Blueprint('auth', __name__)
@@ -59,6 +62,15 @@ def login(api_payload: Dict, *args, **kwargs):
     if password is None:
         raise HttpApiError("Missing password parameter")
 
+    # Attempt a password upgrade here if calling user-agent is < 1.2.10
+    client_type, client_version = _parse_client_version(request.headers.get("User-Agent"))
+    if client_type == ClientType.HA_LIBRARY and Version(client_version) < Version("0.4.6"):
+        _LOGGER.warning("Detected login attempt from old client using non-hashed password.")
+        if _attempt_password_upgrade(email, password):
+            _LOGGER.warning("Password upgrade successful.")
+        else:
+            _LOGGER.error("Password upgrade failed.")
+
     user, token = _user_login(email, password, False)
     _LOGGER.info("User: %s successfully logged in" % email)
     data = {
@@ -68,3 +80,17 @@ def login(api_payload: Dict, *args, **kwargs):
         "email": str(user.email)
     }
     return make_api_response(data=data)
+
+
+def _parse_client_version(user_agent: str) -> Tuple[str, Optional[str]]:
+    """Returns the client type and its version, if available"""
+    if user_agent is None:
+        return ClientType.UNKNOWN, None
+    if (version := re.fullmatch("MerossIOT\/(.*)", user_agent)) is not None:
+        return ClientType.HA_LIBRARY, version.group(1)
+    return ClientType.UNKNOWN, None
+
+
+class ClientType(StrEnum):
+    HA_LIBRARY="MerossIOT",
+    UNKNOWN=""

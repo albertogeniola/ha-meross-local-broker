@@ -37,6 +37,7 @@ class DbHelper:
             hashed_pass = _hash_password(salt=salt, password=password)
             u.email = email
             u.password = hashed_pass
+            u.password_upgraded = True
             if user_key is not None:
                 u.mqtt_key = user_key        
 
