@@ -40,7 +40,7 @@ class User(Base, Serializer):
     password = Column(String(64))
     mqtt_key = Column(String(64))
     owned_devices = relationship("Device", back_populates="owner_user")
-    password_upgraded = Column(Boolean, default=True, nullable=True)  # Null when the password was not yet upgraded.
+    password_upgraded = Column(Boolean, default=True)
 
     def __init__(self, email: str, salt: str, password: str, mqtt_key: str, user_id: Optional[int], *args, **kwargs):
         self.email = email
