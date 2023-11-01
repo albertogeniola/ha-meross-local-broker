@@ -1,5 +1,5 @@
 import re
-from enum import StrEnum
+from enum import Enum
 from meross_iot.model.http.exception import HttpApiError
 
 from logger import get_logger
@@ -86,11 +86,12 @@ def _parse_client_version(user_agent: str) -> Tuple[str, Optional[str]]:
     """Returns the client type and its version, if available"""
     if user_agent is None:
         return ClientType.UNKNOWN, None
-    if (version := re.fullmatch("MerossIOT\/(.*)", user_agent)) is not None:
+    version = re.fullmatch("MerossIOT\/(.*)", user_agent)
+    if version is not None:
         return ClientType.HA_LIBRARY, version.group(1)
     return ClientType.UNKNOWN, None
 
 
-class ClientType(StrEnum):
+class ClientType(Enum):
     HA_LIBRARY="MerossIOT",
     UNKNOWN=""

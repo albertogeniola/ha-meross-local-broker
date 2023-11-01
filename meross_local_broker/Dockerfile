@@ -129,8 +129,10 @@ RUN mkdir -p /tmp/go \
   /tmp/*
 
 # Copy the requirements.txt file and install the listed packages
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+
 COPY rootfs/opt/custom_broker/requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+RUN pip3 install --upgrade pip && source "$HOME/.cargo/env" && PATH=$PATH:$HOME/.cargo/bin pip3 install -r requirements.txt
 
 WORKDIR /
 COPY rootfs /
