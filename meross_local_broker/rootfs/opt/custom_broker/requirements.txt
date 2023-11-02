@@ -6,5 +6,5 @@ flask-cors==3.0.10
 meross_iot==0.4.6.0
 expiringdict==1.2.1
 dbus-python==1.2.18
-pep440_rs==0.3.12
+packaging
 debugpy
