@@ -1,0 +1,68 @@
+name: RC Builder
+
+env:
+  BUILD_ARGS: ""
+  MONITORED_FILES: "build.yaml config.yaml Dockerfile rootfs addon_web_ui"
+
+on:
+  push:
+    tags:
+      - "*.-rc*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build ${{ matrix.arch }} ${{ matrix.addon }} add-on
+    strategy:
+      matrix:
+        addon: ["meross_local_broker"]
+        arch: ["aarch64", "amd64", "armhf", "armv7", "i386"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3.0.2
+
+      - name: Get information
+        id: info
+        uses: home-assistant/actions/helpers/info@master
+        with:
+          path: "./${{ matrix.addon }}"
+
+      - name: Login to GitHub Container Registry
+        if: env.BUILD_ARGS != '--test'
+        uses: docker/login-action@v2.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        id: setup_node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: npm install and npm run build
+        working-directory: meross_local_broker/addon_web_ui
+        run: |
+          npm i
+          npm run-script build
+      - name: Extract version
+        id: set_version
+        working-directory: meross_local_broker
+        run: |
+          rc_version=${GITHUB_REF#refs/*/}
+          echo "{rc_version}={$rc_version}" >> "$GITHUB_OUTPUT"
+          echo "::debug::Version set to $rc_version"
+      - name: Build ${{ matrix.addon }} add-on
+        uses: home-assistant/builder@2023.09.0
+        with:
+          args: |
+            ${{ env.BUILD_ARGS }} \
+            --${{ matrix.arch }} \
+            --target /data/${{ matrix.addon }} \
+            --image "{arch}-meross_local_broker" \
+            --docker-hub "ghcr.io/${{ github.repository_owner }}" \
+            --version "${{steps.set_version.outputs.rc_version}}" \
+            --no-latest \
+            --addon
