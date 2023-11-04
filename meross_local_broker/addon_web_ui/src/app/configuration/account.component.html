@@ -51,11 +51,18 @@
               mat-raised-button
               color="primary"
               type="submit"
-              [disabled]="accountForm.pristine || !accountForm.valid"
+              [disabled]="accountForm.pristine || !accountForm.valid || processing"
             >
               Save
             </button>
-            <button class="vspaced" mat-raised-button color="accent" type="button" (click)="editConfiguration(false)">
+            <button
+              [disabled]="processing"
+              class="vspaced"
+              mat-raised-button
+              color="accent"
+              type="button"
+              (click)="editConfiguration(false)"
+            >
               Cancel
             </button>
           </div>

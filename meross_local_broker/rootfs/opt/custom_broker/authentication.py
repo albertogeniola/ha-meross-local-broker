@@ -36,7 +36,7 @@ def _attempt_password_upgrade(email, password) -> bool:
     old_password = _hash_password(salt=user.salt, password=password, pre_apply_md5=False)
     if not user.password_upgraded and user.password == old_password:
         new_pass = md5(password.encode("utf8")).hexdigest()
-        dbhelper.add_update_user(email=user.email, password=new_pass, user_key=None)
+        dbhelper.add_update_user(user_id=user.user_id, email=user.email, password=new_pass, user_key=None)
         dbhelper.store_event(EventType.USER_PASSWORD_UPGRADE, details=f"User's password has been upgraded for {email}.");
         return True
     return False
