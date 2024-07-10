@@ -8,6 +8,7 @@ from db_helper import dbhelper
 from decorator import meross_http_api
 from logger import get_logger
 from messaging import make_api_response
+from model.db_models import SubDevice
 
 hub_blueprint = Blueprint('hub', __name__)
 _LOGGER = get_logger(__name__)
@@ -32,4 +33,5 @@ def get_subdevices(api_payload: Dict, *args, **kwargs):
         _LOGGER.error("Invalid UUID or device not enrolled")
         raise HttpApiError(error_code=ErrorCodes.CODE_GENERIC_ERROR)
 
-    return make_api_response(data=device.child_subdevices)
+    data = SubDevice.serialize_list(device.child_subdevices)
+    return make_api_response(data=data)
