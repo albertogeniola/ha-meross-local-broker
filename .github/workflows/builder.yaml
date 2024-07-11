@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v4
 
       - name: Get information
         id: info
@@ -33,7 +33,7 @@ jobs:
 
       - name: Login to GitHub Container Registry
         if: env.BUILD_ARGS != '--test'
-        uses: docker/login-action@v2.0.0
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -41,9 +41,10 @@ jobs:
 
       - name: Setup Node
         id: setup_node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 12
+          cache: npm
 
       - name: npm install and npm run build
         working-directory: meross_local_broker/addon_web_ui
@@ -52,7 +53,7 @@ jobs:
           npm run-script build
 
       - name: Build ${{ matrix.addon }} add-on
-        uses: home-assistant/builder@2023.09.0
+        uses: home-assistant/builder@2024.03.5
         with:
           args: |
             ${{ env.BUILD_ARGS }} \

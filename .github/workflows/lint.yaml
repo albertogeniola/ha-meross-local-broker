@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v4
 
       - name: 🚀 Run Home Assistant Add-on Lint
-        uses: frenck/action-addon-linter@v2.13.2
+        uses: frenck/action-addon-linter@v2
         with:
           path: "./meross_local_broker"
