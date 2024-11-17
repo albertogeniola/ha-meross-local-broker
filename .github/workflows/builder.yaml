@@ -45,10 +45,10 @@ jobs:
         with:
           node-version: 12
           cache: npm
-          cache-dependency-path: meross_local_broker/addon_web_ui
+          cache-dependency-path: meross_local_broker/addon_web_ui/package-lock.json
 
       - name: npm install and npm run build
-        working-directory: meross_local_broker/addon_web_ui/package-lock.json
+        working-directory: meross_local_broker/addon_web_ui
         run: |
           npm i
           npm run-script build
