@@ -68,6 +68,5 @@ jobs:
             --target /data/${{ matrix.addon }} \
             --image "{arch}-meross_local_broker" \
             --docker-hub "ghcr.io/${{ github.repository_owner }}" \
-            --version "${{steps.set_version.outputs.dev_version}}" \
             --no-latest \
             --addon
