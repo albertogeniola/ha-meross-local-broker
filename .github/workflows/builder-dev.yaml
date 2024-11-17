@@ -60,7 +60,7 @@ jobs:
           echo "{dev_version}={$version}" >> "$GITHUB_OUTPUT"
           echo "::debug::Version set to $version"
       - name: Build ${{ matrix.addon }} add-on for ${{ matrix.arch }}
-        uses: home-assistant/builder@2024.08.0
+        uses: home-assistant/builder@2024.08.2
         with:
           args: |
             ${{ env.BUILD_ARGS }} \
@@ -68,5 +68,6 @@ jobs:
             --target /data/${{ matrix.addon }} \
             --image "{arch}-meross_local_broker" \
             --docker-hub "ghcr.io/${{ github.repository_owner }}" \
+            --version "${{steps.set_version.outputs.dev_version}}" \
             --no-latest \
             --addon
