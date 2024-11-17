@@ -41,9 +41,10 @@ jobs:
 
       - name: Setup Node
         id: setup_node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 12
+          cache: npm
 
       - name: npm install and npm run build
         working-directory: meross_local_broker/addon_web_ui
@@ -52,7 +53,7 @@ jobs:
           npm run-script build
 
       - name: Build ${{ matrix.addon }} add-on
-        uses: home-assistant/builder@2023.09.0
+        uses: home-assistant/builder@2024.03.5
         with:
           args: |
             ${{ env.BUILD_ARGS }} \
