@@ -20,8 +20,9 @@ WORKDIR /usr/src
 
 # Install base dependencies
 # hadolint ignore=DL3003
-RUN apt-get update \
-  && apt-get install --no-install-recommends -y gnupg gpg-agent \
+RUN apt-get update 
+
+RUN apt-get install --no-install-recommends -y gnupg gpg-agent \
   && apt-get --no-install-recommends install -y \
   build-essential \
   git \

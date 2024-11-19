@@ -1,5 +1,5 @@
 name: "Meross Local Broker Addon"
-version: "0.0.1-alpha49"
+version: "0.0.1-alpha50"
 description: "Enables LAN-ONLY broker, avoiding Meross Cloud usage."
 slug: "meross_local_broker"
 image: "ghcr.io/albertogeniola/{arch}-meross_local_broker"
