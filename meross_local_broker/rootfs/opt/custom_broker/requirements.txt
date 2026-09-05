@@ -8,3 +8,4 @@ expiringdict==1.2.1
 dbus-python==1.2.18
 packaging
 debugpy
+backports.zoneinfo==0.2.1; python_version < "3.9"

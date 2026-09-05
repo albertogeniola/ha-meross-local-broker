@@ -5,9 +5,9 @@ import re
 import ssl
 import time
 import uuid
-from datetime import datetime
-from threading import RLock
-from typing import Dict, List
+from datetime import datetime, timedelta
+from threading import RLock, Thread
+from typing import Dict, List, Optional
 
 import paho.mqtt.client as mqtt
 from expiringdict import ExpiringDict
@@ -19,6 +19,7 @@ from db_helper import dbhelper
 from logger import get_logger, set_logger_level
 from model.db_models import Device
 from protocol import _build_mqtt_message
+from timezone_utils import build_time_payload, build_time_rules, needs_time_sync
 
 CLIENT_ID = 'broker_agent'
 APPLIANCE_MESSAGE_TOPICS = '/appliance/+/publish'
@@ -35,6 +36,11 @@ DISCONNECTION_TOPIC_RE = re.compile("^\$SYS/client-disconnections$")
 _NAT_RE = re.compile("/_nat_/([a-zA-Z0-9\-]+)")
 _CLIENTID_RE = re.compile('^fmware:([a-zA-Z0-9]+)_[a-zA-Z0-9]+$')
 _DEVICE_UPDATE_CACHE_INTERVAL_SECONDS = 60
+# How often the agent polls Appliance.System.All from devices with stale info (devices reconnecting after a
+# broker restart publish nothing on their own, so this is what keeps their status and timezone in sync)
+_DEVICE_REFRESH_INTERVAL_SECONDS = 60
+# Minimum interval between two Appliance.System.Time pushes to the same device (avoids loops if a device refuses it)
+_TIMEZONE_SYNC_COOLDOWN_SECONDS = 600
 
 
 def parse_args():
@@ -45,6 +51,8 @@ def parse_args():
     parser.add_argument('--password', type=str, required=True, help='MQTT password')
     parser.add_argument('--debug', dest='debug', action='store_true', help='When set, prints debug messages')
     parser.add_argument('--cert-ca', required=True, type=str, help='Path to the root CA certificate path')
+    parser.add_argument('--timezone', type=str, default=None,
+                        help='IANA timezone (e.g. Europe/Rome) pushed to devices that report none. Disabled when omitted.')
     parser.set_defaults(debug=False)
     parser.set_defaults(enable_bridging=False)
     return parser.parse_args()
@@ -67,13 +75,16 @@ class Broker:
                  username: str,
                  password: str,
                  cert_ca: str,
-                 enable_bridging: bool):
+                 enable_bridging: bool,
+                 device_timezone: Optional[str] = None):
         self.hostname = hostname
         self.port = port
         self.username = username
         self.password = password
         self.cert_ca = cert_ca
         self.bridging_enabled = enable_bridging
+        self.device_timezone = self._validate_timezone(device_timezone)
+        self._timezone_sync_attempts = {}
         self.c = mqtt.Client(client_id="broker", clean_session=True, protocol=mqtt.MQTTv311, transport="tcp")
         self.c.username_pw_set(username=self.username, password=self.password)
 
@@ -140,6 +151,30 @@ class Broker:
                                               dev_key=device.owner_user.mqtt_key)
         self.c.publish(topic=f"/appliance/{device_uuid}/subscribe", payload=msg)
 
+    def refresh_stale_devices(self) -> List[str]:
+        """Issue Appliance.System.All to every known device whose info is missing or older than the cache interval."""
+        now = datetime.now()
+        refreshed = []
+        for device in dbhelper.get_all_devices():
+            last_update_ts = self._devices_sys_info_timestamp.get(device.uuid)
+            if last_update_ts is None or (now - last_update_ts).total_seconds() > _DEVICE_UPDATE_CACHE_INTERVAL_SECONDS:
+                self._issue_device_get_all(device.uuid)
+                refreshed.append(device.uuid)
+        return refreshed
+
+    def start_periodic_refresh(self, interval_seconds: int = _DEVICE_REFRESH_INTERVAL_SECONDS) -> Thread:
+        def _loop():
+            while True:
+                time.sleep(interval_seconds)
+                try:
+                    self.refresh_stale_devices()
+                except Exception:
+                    l.exception("Periodic device refresh failed")
+
+        thread = Thread(target=_loop, name="device-refresh", daemon=True)
+        thread.start()
+        return thread
+
     def _handle_device_publication(self, device_uuid: str, topic: str, payload: dict):
         # If the message comes from a known device, update its online status
         dbhelper.update_device_status(device_uuid=device_uuid, status=OnlineStatus.ONLINE)
@@ -185,6 +220,41 @@ class Broker:
             self._forward_message_to_remote(bridge_uuid=device_uuid, topic=topic,
                                             payload=json.dumps(payload).encode("utf8"))
 
+    @staticmethod
+    def _validate_timezone(tz_name: Optional[str]) -> Optional[str]:
+        if not tz_name:
+            l.info("No device timezone configured: devices will not receive Appliance.System.Time")
+            return None
+        try:
+            build_time_rules(tz_name, start_ts=int(time.time()), years=1)
+        except ValueError:
+            l.error("Unknown timezone '%s': device time sync disabled", tz_name)
+            return None
+        return tz_name
+
+    def _sync_device_timezone(self, device_uuid: str, device_time: Optional[dict], dev_key: str) -> bool:
+        """Push the configured timezone (with DST rules) to a device reporting a missing/different one.
+
+        The Meross cloud does this on every connection; power-metering devices keep reporting zero
+        electricity/consumption values until they receive it. Returns True when a message was published.
+        """
+        if not needs_time_sync(device_time, self.device_timezone):
+            return False
+        now = time.time()
+        last_attempt = self._timezone_sync_attempts.get(device_uuid)
+        if last_attempt is not None and now - last_attempt < _TIMEZONE_SYNC_COOLDOWN_SECONDS:
+            l.debug("Timezone sync for device %s attempted recently, skipping", device_uuid)
+            return False
+        reported = (device_time or {}).get('timezone')
+        l.info("Device %s reports timezone %r, pushing %s", device_uuid, reported, self.device_timezone)
+        msg, _ = _build_mqtt_message(method="SET",
+                                              namespace="Appliance.System.Time",
+                                              payload=build_time_payload(self.device_timezone, now_ts=int(now)),
+                                              dev_key=dev_key)
+        self.c.publish(topic=f"/appliance/{device_uuid}/subscribe", payload=msg)
+        self._timezone_sync_attempts[device_uuid] = now
+        return True
+
     def _handle_message_to_agent(self, topic: str, payload: dict) -> None:
         # Try to guess the channels from the system_all payload
         namespace = payload.get('header', {}).get('namespace', None)
@@ -205,7 +275,7 @@ class Broker:
             # Update device info
             hardware = system.get('hardware')
             firmware = system.get('firmware')
-            time = system.get('time')
+            device_time = system.get('time')
             online = system.get('online')
             device = dbhelper.get_device_by_uuid(device_uuid=appliance_uuid)
             device.device_type = hardware.get('type')
@@ -216,6 +286,9 @@ class Broker:
             device.online_status = OnlineStatus(online.get('status'))
             device.local_ip = firmware.get('innerIp')
             dbhelper.update_device(device)
+
+            # Like the Meross cloud, make sure the device knows its timezone (needed for power metering)
+            self._sync_device_timezone(appliance_uuid, device_time, device.owner_user.mqtt_key)
 
             digest = payload.get('payload', {}).get('all', {}).get('digest', None)
             if digest is None:
@@ -255,6 +328,10 @@ class Broker:
 
             if self.bridging_enabled:
                 self._get_or_create_bridge(device_uuid=device.uuid)
+
+        elif namespace == 'Appliance.System.Time' and method == 'SETACK':
+            match = APPLIANCE_PUBLISH_TOPIC_RE.fullmatch(from_appliance or '')
+            l.info("Device %s acknowledged the timezone update", match.group(1) if match else from_appliance)
 
     def _handle_device_disconnected(self, payload: dict) -> None:
         if payload.get("event") != "disconnect":
@@ -433,7 +510,9 @@ def main():
                username=args.username,
                password=args.password,
                cert_ca=args.cert_ca,
-               enable_bridging=enable_meross_bridge)
+               enable_bridging=enable_meross_bridge,
+               device_timezone=args.timezone)
+    b.start_periodic_refresh()
 
     reconnect_interval = 10  # [seconds]
     while True:
@@ -441,7 +520,6 @@ def main():
             b.setup()
 
             while True:
-                # Every 60 seconds, issue a full device discovery
                 b.c.loop(timeout=60, max_packets=-1)
                 b.c.loop_forever()
 

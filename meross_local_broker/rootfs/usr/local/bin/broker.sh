@@ -15,6 +15,19 @@ else
 fi
 
 # Generate a random password for agent user
+# Timezone pushed to devices (Appliance.System.Time). Falls back to the Home Assistant timezone (TZ env).
+DEVICE_TIMEZONE=$(get_option 'device_timezone' '')
+if [[ -z "$DEVICE_TIMEZONE" ]]; then
+  DEVICE_TIMEZONE="${TZ:-}"
+fi
+if [[ -n "$DEVICE_TIMEZONE" ]]; then
+  bashio::log.info "Devices will be kept in sync with timezone ${DEVICE_TIMEZONE}"
+  timezone_args=(--timezone "$DEVICE_TIMEZONE")
+else
+  bashio::log.warning "No timezone available (device_timezone option or TZ env): device time sync disabled"
+  timezone_args=()
+fi
+
 AGENT_USERNAME="_agent"
 AGENT_PASSWORD=$(openssl rand -base64 32)
 AGENT_PBKDF2=$(/usr/share/mosquitto/pw -p $AGENT_PASSWORD)
@@ -30,4 +43,4 @@ echo -e "user $AGENT_USERNAME\ntopic readwrite #">/etc/mosquitto/auth.acl
 bashio::log.info "Waiting MQTT server..."
 bashio::net.wait_for 2001
 
-exec python3 broker_agent.py --port 2001 --host localhost --username "$AGENT_USERNAME" --password "$AGENT_PASSWORD" --cert-ca "/data/mqtt/certs/ca.crt" $debug
+exec python3 broker_agent.py --port 2001 --host localhost --username "$AGENT_USERNAME" --password "$AGENT_PASSWORD" --cert-ca "/data/mqtt/certs/ca.crt" "${timezone_args[@]}" $debug
