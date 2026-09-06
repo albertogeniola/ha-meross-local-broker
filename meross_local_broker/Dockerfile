@@ -22,7 +22,6 @@ WORKDIR /usr/src
 # Install base dependencies
 # hadolint ignore=DL3003
 RUN apt-get update \
-  && apt-get install --no-install-recommends -y gnupg gpg-agent \
   && apt-get --no-install-recommends install -y \
   build-essential \
   git \
@@ -40,7 +39,6 @@ RUN apt-get update \
   python3-setuptools \
   python3-pip \
   nginx \
-  software-properties-common \
   xsltproc \
   logrotate \
   libglib2.0-0 \
