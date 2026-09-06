@@ -10,7 +10,8 @@ ENV HIVEMQ='b2043e7fcbd5897a3799869d42c6202122221fbc' \
   MOSQUITTO='2.0.10' \
   MOSQUITTO_GO_AUTH='1.5.0' \
   MOSQUTTO_DISCONNECT='0.0.1' \
-  GOVERSION=1.16.4
+  GOVERSION=1.16.4 \
+  PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Set shell
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -20,9 +21,8 @@ WORKDIR /usr/src
 
 # Install base dependencies
 # hadolint ignore=DL3003
-RUN apt-get update 
-
-RUN apt-get install --no-install-recommends -y gnupg gpg-agent \
+RUN apt-get update \
+  && apt-get install --no-install-recommends -y gnupg gpg-agent \
   && apt-get --no-install-recommends install -y \
   build-essential \
   git \
@@ -32,7 +32,7 @@ RUN apt-get install --no-install-recommends -y gnupg gpg-agent \
   python3-dev \
   dbus \
   bash \
-  sqlite \
+  sqlite3 \
   curl \
   socat \
   openssl \
@@ -81,6 +81,7 @@ RUN mkdir -p /tmp/go \
   && cmake .. \
   -DCMAKE_BUILD_TYPE=MinSizeRel \
   -DCMAKE_INSTALL_PREFIX=/usr \
+  -DCMAKE_C_FLAGS="-Wno-deprecated-declarations -Wno-error" \
   -DLWS_IPV6=OFF \
   -DLWS_WITHOUT_BUILTIN_GETIFADDRS=ON \
   -DLWS_WITHOUT_CLIENT=ON \
@@ -114,7 +115,7 @@ RUN mkdir -p /tmp/go \
   && cd /tmp \
   && git clone --depth 1 --branch "${MOSQUITTO_GO_AUTH}" \
   https://github.com/iegomez/mosquitto-go-auth.git \
-  && export GOPROXY='direct' \
+  && export GOPROXY='https://proxy.golang.org,direct' \
   && cd mosquitto-go-auth \
   && make CFLAGS="-I/usr/local/include -fPIC" LDFLAGS="-shared -Wl,-unresolved-symbols=ignore-all" \
   && cp /tmp/mosquitto-go-auth/pw /usr/share/mosquitto/pw \
