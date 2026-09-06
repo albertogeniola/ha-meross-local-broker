@@ -53,6 +53,12 @@ jobs:
           npm i
           npm run-script build
 
+      - name: Disable ASLR for QEMU stability
+        run: sudo sysctl kernel.randomize_va_space=0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Build ${{ matrix.addon }} add-on for ${{ matrix.arch }}
         uses: home-assistant/builder@2024.08.2
         with:

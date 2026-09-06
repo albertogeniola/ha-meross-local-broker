@@ -97,6 +97,7 @@ RUN mkdir -p /tmp/go \
   && echo "add_subdirectory(disconnections)" >> /tmp/mosquitto/plugins/CMakeLists.txt \
   && cd /tmp/mosquitto \
   && cmake . \
+  -D CMAKE_BUILD_TYPE=MinSizeRel \
   -D WITH_ADNS=OFF \
   -D WITH_DOCS=OFF \
   -D WITH_MEMORY_TRACKING=OFF \
