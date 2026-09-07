@@ -47,20 +47,22 @@ def superuser_acl():
 @devs_blueprint.route('/auth', methods=['POST'])
 def device_login():
     """Endpoint called by the MQTT broker plugin to authenticate devices."""
-    content = request.json
+    # Keep broker authentication failures as explicit denials, including
+    # non-JSON requests which Flask 3 would otherwise reject with 415.
+    content = request.get_json(silent=True)
 
-    if content is None:
+    if not isinstance(content, dict):
         _LOGGER.debug("DEVICE_AUTH=> Raw message content: %s", request.data)
         _LOGGER.error(
             "DEVICE_AUTH=> Expected JSON body has not been received.")
         dbhelper.store_event(event_type=EventType.CONNECT_FAILURE, details=f"Invalid connection attempted from {str(request.remote_addr)}")
         return "ko", 403
 
-    username = request.json.get('username')
-    password = request.json.get('password')
-    topic = request.json.get('topic')
-    acc = request.json.get('acc')
-    clientid = request.json.get('clientid')
+    username = content.get('username')
+    password = content.get('password')
+    topic = content.get('topic')
+    acc = content.get('acc')
+    clientid = content.get('clientid')
 
     _LOGGER.debug("LOGIN_CHECK=> username: %s, password: %s, clientid: %s, topic: %s, acc: %s", str(
         username), str(password), str(clientid), str(topic), str(acc))

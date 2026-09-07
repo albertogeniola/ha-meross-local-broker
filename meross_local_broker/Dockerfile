@@ -133,10 +133,15 @@ RUN mkdir -p /tmp/go \
 COPY rootfs/opt/custom_broker/requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
+# Catch incompatible Flask dependencies before publishing an image.
+RUN python3 -c 'from flask import Flask; app = Flask("build_check"); app.add_url_rule("/", view_func=lambda: "ok"); response = app.test_client().get("/"); assert response.status_code == 200 and response.data == b"ok", (response.status_code, response.data)'
+
 WORKDIR /
 COPY rootfs /
 COPY --chown=mosquitto:mosquitto --chmod=0755 rootfs/etc/mosquitto/certs /etc/mosquitto/
 
+# Exercise the real API against disposable data as well as the Flask import check.
+RUN cd /opt/custom_broker && python3 -m unittest test_http_api
 
 RUN mkdir -p /var/run/mdns/meross-mqtt && mkdir -p /var/run/mdns/meross-http-api
 
