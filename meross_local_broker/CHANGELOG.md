@@ -1,9 +1,11 @@
-## Unreleased
+## 0.0.1-alpha53
+
 - Fix the alpha52 startup crash by upgrading Flask to 3.1.3, Werkzeug to 3.1.8, and Flask-CORS to 6.0.5.
 - Preserve signed form requests and explicit MQTT authentication denials with Flask 3's stricter JSON handling.
 - Check Flask imports and request handling during image builds to catch dependency incompatibilities before release.
 
 ## 0.0.1-alpha52
+
 - Push the timezone and DST rules (`Appliance.System.Time`) to devices whose reported timezone is empty or
   different from the configured one, as the Meross cloud does on every connection. Without it, power-metering
   plugs (e.g. mss310, mss210p) keep reporting 0 V / 0 A / 0 W and an empty consumption history (#42).
