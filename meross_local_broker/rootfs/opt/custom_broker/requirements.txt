@@ -1,4 +1,6 @@
 Flask==2.1.0
+# Flask 2.1 imports werkzeug.urls.url_quote, removed in Werkzeug 3.
+Werkzeug==2.3.8
 SQLAlchemy==1.4.3
 paho-mqtt==1.5.1
 asyncio-mqtt==0.8.1
