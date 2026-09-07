@@ -49,9 +49,13 @@ def meross_http_api(original_function=None, login_required=True):
             # - sign: message signature
             # - timestamp
             # - nonce
-            if request.json is not None:
-                l.debug("Found input json (%s)", str(request.json))
-                j = request.json
+            # Flask 3 raises 415 when reading JSON from a form request.
+            # Meross clients support both signed JSON and form envelopes.
+            if request.is_json:
+                j = request.get_json()
+                if not isinstance(j, dict):
+                    raise BadRequestError("Missing or invalid payload")
+                l.debug("Found input json (%s)", str(j))
                 params = j.get('params')
                 signature = j.get('sign')
                 timestamp = j.get('timestamp')
