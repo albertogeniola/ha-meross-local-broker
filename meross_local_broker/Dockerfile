@@ -131,7 +131,8 @@ RUN mkdir -p /tmp/go \
 
 # Copy the requirements.txt file and install the listed packages
 COPY rootfs/opt/custom_broker/requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt \
+  && python3 -c 'from flask import Flask; Flask(__name__)'
 
 WORKDIR /
 COPY rootfs /
