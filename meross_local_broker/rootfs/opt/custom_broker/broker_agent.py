@@ -238,9 +238,9 @@ class Broker:
         The Meross cloud does this on every connection; power-metering devices keep reporting zero
         electricity/consumption values until they receive it. Returns True when a message was published.
         """
-        if not needs_time_sync(device_time, self.device_timezone):
-            return False
         now = time.time()
+        if not needs_time_sync(device_time, self.device_timezone, now_ts=int(now)):
+            return False
         last_attempt = self._timezone_sync_attempts.get(device_uuid)
         if last_attempt is not None and now - last_attempt < _TIMEZONE_SYNC_COOLDOWN_SECONDS:
             l.debug("Timezone sync for device %s attempted recently, skipping", device_uuid)
