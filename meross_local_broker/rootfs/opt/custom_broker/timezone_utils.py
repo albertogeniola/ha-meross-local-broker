@@ -42,7 +42,11 @@ def _bisect_transition(before_ts: int, after_ts: int, tz) -> int:
 
 
 def build_time_rules(tz_name: str, start_ts: int, years: int = DEFAULT_RULE_HORIZON_YEARS) -> List[List[int]]:
-    """Return the DST transitions of ``tz_name`` occurring after ``start_ts`` for the next ``years`` years."""
+    """Return the DST transition in effect at ``start_ts`` followed by those of the next ``years`` years.
+
+    The rule in effect is required: with only future transitions the mss210p firmware keeps reporting
+    zero electricity values, just as if no timezone was set.
+    """
     try:
         tz = ZoneInfo(tz_name)
     except (ZoneInfoNotFoundError, ValueError) as ex:
@@ -51,9 +55,10 @@ def build_time_rules(tz_name: str, start_ts: int, years: int = DEFAULT_RULE_HORI
     start = datetime.fromtimestamp(start_ts, tz=timezone.utc)
     end = start + timedelta(days=365 * years)
     rules = []
-    previous = start
+    # Scan from one year back, then keep only the last transition at or before start_ts.
+    previous = start - timedelta(days=366)
     previous_offset = _utc_offset_seconds(previous, tz)
-    current = start
+    current = previous
     while current < end:
         current = current + _COARSE_STEP
         current_offset = _utc_offset_seconds(current, tz)
@@ -62,7 +67,8 @@ def build_time_rules(tz_name: str, start_ts: int, years: int = DEFAULT_RULE_HORI
             rules.append([transition_ts, current_offset, _is_dst(current, tz)])
             previous_offset = current_offset
         previous = current
-    return rules
+    past = [rule for rule in rules if rule[0] <= start_ts]
+    return past[-1:] + [rule for rule in rules if rule[0] > start_ts]
 
 
 def build_time_payload(tz_name: str, now_ts: int, years: int = DEFAULT_RULE_HORIZON_YEARS) -> Dict:
@@ -76,10 +82,17 @@ def build_time_payload(tz_name: str, now_ts: int, years: int = DEFAULT_RULE_HORI
     }
 
 
-def needs_time_sync(device_time: Optional[Dict], tz_name: Optional[str]) -> bool:
-    """Tell whether the ``system.time`` section reported by a device differs from the configured timezone."""
+def needs_time_sync(device_time: Optional[Dict], tz_name: Optional[str], now_ts: Optional[int] = None) -> bool:
+    """Tell whether the ``system.time`` section reported by a device differs from the configured timezone.
+
+    With ``now_ts``, a device whose rules are all in the future (pushed by older versions of this add-on)
+    also needs a sync, because it lacks the rule in effect.
+    """
     if not tz_name:
         return False
     if device_time is None:
         return True
-    return device_time.get("timezone") != tz_name
+    if device_time.get("timezone") != tz_name:
+        return True
+    rules = device_time.get("timeRule") or []
+    return now_ts is not None and bool(rules) and all(rule[0] > now_ts for rule in rules)
